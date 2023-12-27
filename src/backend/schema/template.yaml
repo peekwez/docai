@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Stage:
+    Type: String
+    Description: Environment stage or git branch
+
+Globals:
+  Function:
+    Timeout: 10
+    Tracing: Active
+    MemorySize: 512
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: schema
+        POWERTOOLS_METRICS_NAMESPACE: ServerlessDocumentAI
+        LOG_LEVEL: INFO
+
+Resources:
+  BuildSchemaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ServerlessDocumentA-BuildSchema-${Stage}
+      Handler: build.lambda_handler
+      CodeUri: src/build-schema
+      Runtime: python3.12
+      Layers:
+        - !Ref SharedLibsLayer
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+  #     # Add properties for the BuildSchema function
+
+  # CreateSchemaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     # Add properties for the CreateSchema function
+
+  # DeleteSchemaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     # Add properties for the DeleteSchema function
+
+  # DisableSchemaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     # Add properties for the DisableSchema function
