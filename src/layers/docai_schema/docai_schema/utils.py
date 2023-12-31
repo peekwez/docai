@@ -1,11 +1,7 @@
 import random
 import string
-import tiktoken
 
-import random
-import string
 import tiktoken
-
 
 alphabet = string.ascii_lowercase + string.digits + string.ascii_uppercase
 tokenizer = tiktoken.get_encoding("cl100k_base")
