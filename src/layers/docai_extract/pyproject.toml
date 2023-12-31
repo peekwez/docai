@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "docai-extract"
+version = "0.1.0"
+description = ""
+authors = ["Kwesi P Apponsah <kwesiparry@gmail.com>"]
+readme = "README.md"
+packages = [{include = "docai_extract"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
