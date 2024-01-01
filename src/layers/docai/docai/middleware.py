@@ -6,9 +6,6 @@ from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
-# from docai_schema import models
-# from docai_schema import typing as T
-
 
 def _build_process_schema_context(event: dict[str, Any]) -> dict[str, Any]:
     data = json.loads(event["body"])
@@ -18,21 +15,26 @@ def _build_process_schema_context(event: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def _logger_inject_process_schema(logger: Logger, schema_context: dict[str, Any]) -> None:
+def _logger_inject_process_schema(
+    logger: Logger, schema_context: dict[str, Any]
+) -> None:
     logger.structure_logs(append=True, **schema_context)
 
 
-def _tracer_annotate_process_schema(tracer: Tracer, schema_context: dict[str, Any]) -> None:
-    tracer.put_annotation(key="Schema", value=schema_context["schema_name"])
+def _tracer_annotate_process_schema(
+    tracer: Tracer, schema_context: dict[str, Any], key: str = "Schema"
+) -> None:
+    tracer.put_annotation(key=key, value=schema_context["schema_name"])
 
 
 @lambda_handler_decorator(trace_execution=True)
-def process_schema(
+def process_docai(
     handler: Callable[[dict[str, Any], LambdaContext], Any],
     event: dict[str, Any],
     context: LambdaContext,
-    logger: Logger = None,
-    tracer: Tracer = None,
+    logger: Logger | None = None,
+    tracer: Tracer | None = None,
+    annotation_key: str = "Schema",
 ) -> Any:
     if logger is None:
         logger = Logger()
@@ -54,5 +56,6 @@ def process_schema(
     _tracer_annotate_process_schema(
         tracer=tracer,
         schema_context=schema_context,
+        key=annotation_key,
     )
     return handler(event, context)

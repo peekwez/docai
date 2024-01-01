@@ -1,2 +1,0 @@
-class SchemaDefinitionTooLarge(Exception):
-    pass

@@ -1,0 +1,6 @@
+boto3
+jsonschema
+tiktoken
+requests
+pdf2image
+aws-lambda-powertools[parser,tracer]
