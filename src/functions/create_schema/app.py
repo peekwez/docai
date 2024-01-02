@@ -3,8 +3,7 @@ from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.parser import BaseModel, Field
 
-from docai import exceptions as exc
-from docai import middleware, models, utils
+from docai import error, middleware, models, utils
 
 logger = Logger()
 tracer = Tracer()
@@ -28,12 +27,6 @@ class CreateSchemaResponseModel(BaseModel):
     number_of_tokens: int
 
 
-class ErrorResponseModel(BaseModel):
-    OK: bool = Field(default=False)
-    error: str
-    message: str
-
-
 RECEIVED_MESSAGE = "Request to create schema `{0.schema_name}` received"
 SUCCESS_MESSAGE = "Schema `{0}` created with schema version `{0.schema_version}`"
 ERROR_MESSAGE = "Failed to create schema {0.schema_name} -  {1}"
@@ -42,9 +35,10 @@ ERROR_MESSAGE = "Failed to create schema {0.schema_name} -  {1}"
 @app.post("/create-schema")
 @tracer.capture_method
 def create_schema():
-    req = CreateSchemaRequestModel(**app.current_event.json_body)
-    logger.info(RECEIVED_MESSAGE.format(req))
     try:
+        req = CreateSchemaRequestModel(**app.current_event.json_body)
+        logger.info(RECEIVED_MESSAGE.format(req))
+
         schema = models.SchemaModel(
             schema_name=req.schema_name,
             schema_description=req.schema_description,
@@ -53,16 +47,10 @@ def create_schema():
         table.put_item(Item=schema.dict())
         logger.info(SUCCESS_MESSAGE.format(schema))
 
-    except exc.SchemaDefinitionTooLarge as e:
-        logger.error(ERROR_MESSAGE.format(req, e))
-        return ErrorResponseModel(
-            error="SchemaDefinitionTooLarge", message=str(e)
-        ).json()
-
     except Exception as e:
         logger.error(ERROR_MESSAGE.format(req, e))
         logger.exception(e)
-        raise e
+        return error.process_error(e)
 
     tracer.put_metadata(schema.schema_name, schema.json())
     metrics.add_metric(name="CreateSchema", unit=MetricUnit.Count, value=1)

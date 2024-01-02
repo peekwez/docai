@@ -17,6 +17,16 @@ def utcnow():
     return datetime.utcnow().isoformat()
 
 
+class ErrorModel(BaseModel):
+    name: str
+    message: str
+
+
+class ErrorResponseModel(BaseModel):
+    OK: bool = Field(default=False)
+    error: ErrorModel
+
+
 class SchemaStatus(StrEnum):
     ACTIVE = "ACTIVE"
     DELETED = "DELETED"

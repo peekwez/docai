@@ -30,9 +30,9 @@ BUNDLE_COMMAND = (
 
 LAMBDA_KWARGS = {
     "runtime": _lambda.Runtime.PYTHON_3_12,
-    "architecture": _lambda.Architecture.ARM_64,
+    "architecture": _lambda.Architecture.X86_64,
     "tracing": _lambda.Tracing.ACTIVE,
-    "timeout": cdk.Duration.seconds(10),
+    "timeout": cdk.Duration.minutes(1),
     "memory_size": 512,
 }
 LOG_LEVEL = "INFO"

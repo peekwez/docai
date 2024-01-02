@@ -5,6 +5,7 @@ from aws_cdk import aws_apigateway as apigw
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as _lambda
+from aws_cdk import aws_logs
 from aws_cdk import aws_secretsmanager as secretsmanager
 from aws_cdk import aws_sqs as sqs
 from aws_cdk import aws_ssm as ssm
@@ -148,13 +149,14 @@ def create_lambda(
         environment=env,
         layers=layers,
         role=role,
+        log_retention=aws_logs.RetentionDays.SIX_MONTHS,
         **c.LAMBDA_KWARGS,
     )
 
     for resource, actions in grants:
         resource.grant(fn, *actions)
 
-    fn_path = api.root.add_resource(params.function_path)
+    fn_path = api.root.add_resource(params.http_path)
     fn_path.add_method(params.http_method, apigw.LambdaIntegration(fn))
 
     return fn

@@ -3,6 +3,7 @@ from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.parser import BaseModel, Field
 
+from docai import error
 from docai import exceptions as exc
 from docai import middleware, models, utils
 
@@ -25,12 +26,6 @@ class ListSchemaResponseModel(BaseModel):
     items: list[models.SchemaModel]
 
 
-class ErrorResponseModel(BaseModel):
-    OK: bool = Field(default=False)
-    error: str
-    message: str
-
-
 RECEIVED_MESSAGE = "Request to list schema `{0.schema_name}` versions received"
 SUCCESS_MESSAGE = "Schema `{0.schema_name}` versions fetched"
 ERROR_MESSAGE = "Failed to fetch schema {0.schema_name} versions - {1}"
@@ -39,9 +34,10 @@ ERROR_MESSAGE = "Failed to fetch schema {0.schema_name} versions - {1}"
 @app.post("/list-schema")
 @tracer.capture_method
 def list_schema():
-    req = ListSchemaRequestModel(**app.current_event.json_body)
-    logger.info(RECEIVED_MESSAGE.format(req))
     try:
+        req = ListSchemaRequestModel(**app.current_event.json_body)
+        logger.info(RECEIVED_MESSAGE.format(req))
+
         data = table.query(
             KeyConditionExpression="schema_name = :schema_name",
             FilterExpression="schema_status <> :schema_status",
@@ -51,19 +47,15 @@ def list_schema():
             },
         )
         if not data:
-            raise exc.SchemaDoesNotExist("Schema not found")
+            raise exc.SchemaDoesNotExist
 
         items = [models.SchemaModel(**item) for item in data["Items"]]
         logger.info(SUCCESS_MESSAGE.format(req))
 
-    except exc.SchemaDoesNotExist as e:
-        logger.error(ERROR_MESSAGE.format(req, e))
-        return ErrorResponseModel(error="SchemaDoesNotExist", message=str(e)).json()
-
     except Exception as e:
         logger.error(ERROR_MESSAGE.format(req, e))
         logger.exception(e)
-        raise e
+        return error.process_error(e)
 
     tracer.put_metadata(req.schema_name, req.json())
     metrics.add_metric(name="ListSchema", unit=MetricUnit.Count, value=1)

@@ -3,6 +3,7 @@ from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.parser import BaseModel, Field
 
+from docai import error
 from docai import exceptions as exc
 from docai import middleware, models, utils
 
@@ -25,12 +26,6 @@ class DeleteSchemaResponseModel(BaseModel):
     message: str = Field(default="Schema deleted successfully")
 
 
-class ErrorResponseModel(BaseModel):
-    OK: bool = Field(default=False)
-    error: str
-    message: str
-
-
 RECEIVED_MESSAGE = (
     "Request to delete schema `{0.schema_name} - {0.schema_version}` received"
 )
@@ -41,16 +36,17 @@ ERROR_MESSAGE = "Failed to update schema {0.schema_name} - {0.schema_version} - 
 @app.put("/delete-schema")
 @tracer.capture_method
 def delete_schema():
-    req = DeleteSchemaRequestModel(**app.current_event.json_body)
-    logger.info(RECEIVED_MESSAGE.format(req))
     try:
+        req = DeleteSchemaRequestModel(**app.current_event.json_body)
+        logger.info(RECEIVED_MESSAGE.format(req))
+
         key = {"schema_name": req.schema_name, "schema_version": req.schema_version}
         data = table.get_item(Key=key).get("Item")
         if not data:
-            raise exc.SchemaDoesNotExist("Schema not found")
+            raise exc.SchemaDoesNotExist
 
         if data["schema_status"] == models.SchemaStatus.DELETED.value:
-            raise exc.SchemaDoesNotExist("Schema not found")
+            raise exc.SchemaDoesNotExist
 
         schema = models.SchemaModel(**data)
         table.update_item(
@@ -61,15 +57,10 @@ def delete_schema():
             },
         )
         logger.info(SUCCESS_MESSAGE.format(req))
-
-    except exc.SchemaDoesNotExist as e:
-        logger.error(ERROR_MESSAGE.format(req, e))
-        return ErrorResponseModel(error="SchemaDoesNotExist", message=str(e)).json()
-
     except Exception as e:
         logger.error(ERROR_MESSAGE.format(req, e))
         logger.exception(e)
-        raise e
+        return error.process_error(e)
 
     tracer.put_metadata(req.schema_name, schema.json())
     metrics.add_metric(name="DeleteSchema", unit=MetricUnit.Count, value=1)
