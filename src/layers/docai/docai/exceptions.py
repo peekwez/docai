@@ -27,9 +27,9 @@ class InvalidData(Exception):
 
 
 EXCEPTIONS = (
-    ValidationError,
-    SchemaDefinitionTooLarge,
-    SchemaDoesNotExist,
-    InvalidMimeType,
     InvalidData,
+    InvalidMimeType,
+    ValidationError,
+    SchemaDoesNotExist,
+    SchemaDefinitionTooLarge,
 )

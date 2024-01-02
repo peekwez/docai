@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from aws_lambda_powertools.utilities.parser import BaseModel, Field, validator
 from jsonschema import Draft202012Validator as JSONValidator
@@ -18,13 +18,21 @@ def utcnow():
 
 
 class ErrorModel(BaseModel):
-    name: str
-    message: str
+    error_name: str
+    error_message: str
+
+
+class ResultResponseModel(BaseModel):
+    OK: Literal[True] = True
+    result: dict
 
 
 class ErrorResponseModel(BaseModel):
-    OK: bool = Field(default=False)
+    OK: Literal[False] = False
     error: ErrorModel
+
+    def log_dict(self) -> dict:
+        return self.error.dict()
 
 
 class SchemaStatus(StrEnum):

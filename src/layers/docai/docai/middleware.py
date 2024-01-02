@@ -1,30 +1,19 @@
-import json
 from typing import Any, Callable
 
-from aws_lambda_powertools import Logger, Tracer
+from aws_lambda_powertools import Logger, Metrics, Tracer
 from aws_lambda_powertools.logging import correlation_paths
+from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
-
-def _build_process_schema_context(event: dict[str, Any]) -> dict[str, Any]:
-    data = json.loads(event["body"])
-    return dict(
-        schema_name=data["schema_name"],
-        schema_version=data.get("schema_version"),
-    )
+from docai import error
+from docai import exceptions as exc
+from docai import models
 
 
-def _logger_inject_process_schema(
-    logger: Logger, schema_context: dict[str, Any]
-) -> None:
-    logger.structure_logs(append=True, **schema_context)
-
-
-def _tracer_annotate_process_schema(
-    tracer: Tracer, schema_context: dict[str, Any], key: str = "Schema"
-) -> None:
-    tracer.put_annotation(key=key, value=schema_context["schema_name"])
+def _validate_request(event: dict[str, Any], model: Any) -> Any:
+    data = model.parse_raw(event["body"])
+    return data
 
 
 @lambda_handler_decorator(trace_execution=True)
@@ -32,30 +21,50 @@ def process_docai(
     handler: Callable[[dict[str, Any], LambdaContext], Any],
     event: dict[str, Any],
     context: LambdaContext,
+    validation_model: Any,
+    messages: dict[str, str],
+    include_fields: list[str],
+    annotation_key: str = "Schema",
     logger: Logger | None = None,
     tracer: Tracer | None = None,
-    annotation_key: str = "Schema",
+    metrics: Metrics | None = None,
 ) -> Any:
     if logger is None:
         logger = Logger()
 
-    if tracer is None:  # pragma: no cover
+    if tracer is None:
         tracer = Tracer(auto_patch=False)
 
-    schema_context = _build_process_schema_context(event)
+    if metrics is None:
+        metrics = Metrics()
+
     handler = logger.inject_lambda_context(
-        handler,
-        correlation_id_path=correlation_paths.API_GATEWAY_REST,
-        log_event=True,
+        handler, correlation_id_path=correlation_paths.API_GATEWAY_REST
     )
 
-    _logger_inject_process_schema(
-        logger=logger,
-        schema_context=schema_context,
-    )
-    _tracer_annotate_process_schema(
-        tracer=tracer,
-        schema_context=schema_context,
-        key=annotation_key,
-    )
-    return handler(event, context)
+    try:
+        req = _validate_request(event, validation_model)
+        logger.info(messages["RECEIVED"], req.dict(include=include_fields))
+
+        event["valid_body"] = req.dict()
+        data = handler(event, context)
+
+        ret = models.ResultResponseModel(result=data)
+
+        logger.info(messages["SUCCESS"], result=data)
+        tracer.put_annotation(annotation_key, "SUCCESS")
+        tracer.put_metadata(annotation_key, data)
+        metrics.add_metric(annotation_key, unit=MetricUnit.Count, value=1)
+
+    except exc.EXCEPTIONS as e:
+        err = error.process_error(e)
+        logger.error(messages["ERROR"], error=err.log_dict())
+        tracer.put_annotation(annotation_key, "FAILED")
+        return {"statusCode": 400, "body": err.json()}
+    except Exception as e:
+        err = error.process_error(e)
+        logger.error(messages["ERROR"], error=err.log_dict())
+        tracer.put_annotation(annotation_key, "FAILED")
+        raise e
+
+    return {"body": ret.json()}

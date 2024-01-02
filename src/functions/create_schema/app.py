@@ -1,69 +1,47 @@
 from aws_lambda_powertools import Logger, Metrics, Tracer
 from aws_lambda_powertools.event_handler import APIGatewayRestResolver
-from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.parser import BaseModel, Field
 
-from docai import error, middleware, models, utils
-
-logger = Logger()
-tracer = Tracer()
-metrics = Metrics()
-app = APIGatewayRestResolver()
+from docai import middleware, models, utils
 
 
-resource = utils.Resource()
-table = resource.get_table("/env/schema/table/name")
-
-
-class CreateSchemaRequestModel(BaseModel):
+class RequestModel(BaseModel):
     schema_name: str = Field(..., min_length=4, max_length=64)
     schema_description: str = Field(..., min_length=8, max_length=1028)
     schema_definition: dict
 
 
-class CreateSchemaResponseModel(BaseModel):
-    schema_name: str
-    schema_version: str
-    number_of_tokens: int
+logger = Logger()
+tracer = Tracer()
+metrics = Metrics()
+
+table = utils.Resource().get_table("/env/schema/table/name")
+params = {
+    "validation_model": RequestModel,
+    "messages": {
+        "RECEIVED": "Request to create schema received",
+        "SUCCESS": "Schema created successfully",
+        "ERROR": "Failed to create schema",
+    },
+    "include_fields": {
+        "schema_name",
+        "schema_version",
+    },
+    "annotation_key": "CreateSchema",
+    "logger": logger,
+    "tracer": tracer,
+    "metrics": metrics,
+}
 
 
-RECEIVED_MESSAGE = "Request to create schema `{0.schema_name}` received"
-SUCCESS_MESSAGE = "Schema `{0}` created with schema version `{0.schema_version}`"
-ERROR_MESSAGE = "Failed to create schema {0.schema_name} -  {1}"
-
-
-@app.post("/create-schema")
 @tracer.capture_method
-def create_schema():
-    try:
-        req = CreateSchemaRequestModel(**app.current_event.json_body)
-        logger.info(RECEIVED_MESSAGE.format(req))
-
-        schema = models.SchemaModel(
-            schema_name=req.schema_name,
-            schema_description=req.schema_description,
-            schema_definition=req.schema_definition,
-        )
-        table.put_item(Item=schema.dict())
-        logger.info(SUCCESS_MESSAGE.format(schema))
-
-    except Exception as e:
-        logger.error(ERROR_MESSAGE.format(req, e))
-        logger.exception(e)
-        return error.process_error(e)
-
-    tracer.put_metadata(schema.schema_name, schema.json())
-    metrics.add_metric(name="CreateSchema", unit=MetricUnit.Count, value=1)
-
-    ret = CreateSchemaResponseModel(
-        schema_name=schema.schema_name,
-        schema_version=schema.schema_version,
-        number_of_tokens=schema.number_of_tokens,
-    )
-    return ret.json()
+def create_schema(req: dict):
+    schema = models.SchemaModel(**req)
+    table.put_item(Item=schema.dict())
+    return schema.dict(include={"schema_name", "schema_version", "number_of_tokens"})
 
 
 @metrics.log_metrics(capture_cold_start_metric=True)
-@middleware.process_docai(logger=logger, tracer=tracer, annotation_key="Schema")
+@middleware.process_docai(**params)
 def lambda_handler(event, context):
-    return app.resolve(event, context)
+    return create_schema(event["valid_body"])

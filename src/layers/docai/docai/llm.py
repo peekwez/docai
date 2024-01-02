@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import requests
 
@@ -21,10 +22,24 @@ def is_pdf(mime_type: str) -> bool:
     return mime_type == models.MimeTypeEnum.PDF.value
 
 
+def is_text(mime_type: str) -> bool:
+    return mime_type == models.MimeTypeEnum.TXT.value
+
+
+def load_media(content: str, mime_type: str) -> list[str]:
+    if is_pdf(mime_type):
+        return utils.load_pdf(content)
+    if is_image(mime_type):
+        return utils.load_image(content)
+    return []
+
+
 class OpenAIClient:
     def __init__(self):
         config = utils.Config()
-        secrets = json.loads(config.get_secret("/env/openai/secret/name"))
+        secrets_raw = config.get_secret("/env/openai/secret/name")
+        secrets = json.loads(secrets_raw)
+
         self.__headers = {
             "Authorization": secrets["OPENAI_API_KEY"],
             "Content-Type": "application/json",
@@ -36,7 +51,7 @@ class OpenAIClient:
         data = response["choices"][0]["message"]["content"]
         return utils.validate_data(data, schema["schema_definition"])
 
-    def __call_api(self, model: str, messages: list[dict]) -> dict:
+    def __call_api(self, model: str, messages: list[object]) -> dict:
         payload = {
             "model": model,
             "messages": messages,
@@ -48,47 +63,28 @@ class OpenAIClient:
         response.raise_for_status()
         return response.json()
 
-    def __prepare_messages(
-        self, schema_data: dict, text_data: str, image_data: list[dict]
-    ) -> list[dict]:
-        contents = (
-            [
-                {
-                    "type": "text",
-                    "text": c.USER_INSTRUCTIONS_FORMAT.format(
-                        schema=schema_data, content=text_data
-                    ),
-                },
-                *image_data,
-            ],
-        )
-        messages: list[dict] = [
-            {"role": "system", "content": c.SYSTEM_MESSAGE},
-            {"role": "user", "content": contents},
-        ]
-
-        return messages
-
     def __call__(
-        self, document: models.DocumentModel, schema: dict, unwrap: bool = True
+        self, document: dict[str, str], schema: dict[str, str], unwrap: bool = True
     ) -> dict:
         schema_data = schema["schema_definition"]
-        text_data = document.content if document.is_text() else ""
+        mime_type = document["mime_type"]
+        content = document["content"] if is_text(mime_type) else ""
 
-        image_data = []
-        if document.is_pdf():
-            image_data = [
-                {"type": "image_url", "image_url": {"url": data}}
-                for data in utils.load_pdf(document.content)
-            ]
-        elif document.is_image():
-            image_data = [
-                {"type": "image_url", "image_url": {"url": data}}
-                for data in utils.load_image(document.content)
-            ]
+        text = c.USER_INSTRUCTIONS_FORMAT.format(schema=schema_data, content=content)
+        text_content = {"type": "text", "text": text}
+        image_content = [
+            {"type": "image_url", "image_url": {"url": image}}
+            for image in load_media(content, mime_type)
+        ]
+        user_content = [text_content, *image_content]
+        messages = [
+            {"role": "system", "content": c.SYSTEM_MESSAGE},
+            {"role": "user", "content": user_content},
+        ]
 
-        messages = self.__prepare_messages(schema_data, text_data, image_data)
-        model = c.VISION_MODEL if image_data else c.TEXT_MODEL
+        model = c.TEXT_MODEL
+        if image_content:
+            model = c.VISION_MODEL
 
         response = self.__call_api(model, messages)
         if unwrap:
