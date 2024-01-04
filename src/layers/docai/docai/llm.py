@@ -1,57 +1,28 @@
-import json
 from typing import Any
 
-import requests
+import boto3
+from openai import OpenAI
 
 from docai import constants as c
-from docai import models, utils
+from docai import stream, utils
 
 
-def is_image(mime_type: str) -> bool:
-    return mime_type in (
-        models.MimeTypeEnum.PNG.value,
-        models.MimeTypeEnum.JPG.value,
-        models.MimeTypeEnum.JPEG.value,
-        models.MimeTypeEnum.GIF.value,
-        models.MimeTypeEnum.BMP.value,
-        models.MimeTypeEnum.TIFF.value,
-    )
+class LLMClient:
+    def __init__(
+        self,
+        api_key: str,
+    ):
+        self.__openai = OpenAI(api_key=api_key)
 
+    def __unwrap_response(self, response: dict, schema_definition: dict) -> dict:
+        valid_data = utils.validate_data(
+            response["choices"][0]["message"]["content"], schema_definition
+        )
+        return {"result": valid_data, "metadata": response["usage"]}
 
-def is_pdf(mime_type: str) -> bool:
-    return mime_type == models.MimeTypeEnum.PDF.value
-
-
-def is_text(mime_type: str) -> bool:
-    return mime_type == models.MimeTypeEnum.TXT.value
-
-
-def load_media(content: str, mime_type: str) -> list[str]:
-    if is_pdf(mime_type):
-        return utils.load_pdf(content)
-    if is_image(mime_type):
-        return utils.load_image(content)
-    return []
-
-
-class OpenAIClient:
-    def __init__(self):
-        config = utils.Config()
-        secrets_raw = config.get_secret("/env/openai/secret/name")
-        secrets = json.loads(secrets_raw)
-
-        self.__headers = {
-            "Authorization": secrets["OPENAI_API_KEY"],
-            "Content-Type": "application/json",
-        }
-
-        self.__url = secrets["OPENAI_API_URL"]
-
-    def __unwrap(self, response: dict, schema: dict) -> dict:
-        data = response["choices"][0]["message"]["content"]
-        return utils.validate_data(data, schema["schema_definition"])
-
-    def __call_api(self, model: str, messages: list[object]) -> dict:
+    def __call_api(
+        self, schema_definition: dict, model: str, messages: Any, images: dict
+    ) -> dict:
         payload = {
             "model": model,
             "messages": messages,
@@ -59,34 +30,35 @@ class OpenAIClient:
             "temperature": c.TEMPERATURE,
             "max_tokens": c.MAX_OUTPUT_TOKENS,
         }
-        response = requests.post(self.__url, headers=self.__headers, json=payload)
-        response.raise_for_status()
-        return response.json()
+        data = {"request": payload, "images": images, "error": None}
+        completion = self.__openai.chat.completions.create(**payload)
+        response = self.__unwrap_response(completion.dict(), schema_definition)
+        data.update(response)
+        return data
 
     def __call__(
-        self, document: dict[str, str], schema: dict[str, str], unwrap: bool = True
+        self,
+        schema_definition: dict,
+        text_data: str,
+        s3: boto3.client,
+        bucket_name: str,
+        image_list: list[str] | None = None,
     ) -> dict:
-        schema_data = schema["schema_definition"]
-        mime_type = document["mime_type"]
-        content = document["content"] if is_text(mime_type) else ""
+        images = {}
+        text = c.USER_INSTRUCTIONS_FORMAT.format(
+            schema=schema_definition, content=text_data
+        )
 
-        text = c.USER_INSTRUCTIONS_FORMAT.format(schema=schema_data, content=content)
-        text_content = {"type": "text", "text": text}
-        image_content = [
-            {"type": "image_url", "image_url": {"url": image}}
-            for image in load_media(content, mime_type)
-        ]
-        user_content = [text_content, *image_content]
+        user_content: list[dict[str, dict | str]] = [{"type": "text", "text": text}]
+        if image_list:
+            images = stream.generate_presigned_url(s3, bucket_name, image_list)
+            for _, url in images.items():
+                user_content.append({"type": "image_url", "image_url": {"url": url}})
+
         messages = [
             {"role": "system", "content": c.SYSTEM_MESSAGE},
             {"role": "user", "content": user_content},
         ]
 
-        model = c.TEXT_MODEL
-        if image_content:
-            model = c.VISION_MODEL
-
-        response = self.__call_api(model, messages)
-        if unwrap:
-            return self.__unwrap(response, schema)
-        return response
+        model = c.VISION_MODEL if images else c.TEXT_MODEL
+        return self.__call_api(schema_definition, model, messages, images)

@@ -23,10 +23,7 @@ params = {
         "SUCCESS": "Schema created successfully",
         "ERROR": "Failed to create schema",
     },
-    "include_fields": {
-        "schema_name",
-        "schema_version",
-    },
+    "include_fields": {"schema_name", "schema_version"},
     "annotation_key": "CreateSchema",
     "logger": logger,
     "tracer": tracer,

@@ -26,10 +26,7 @@ params = {
         "SUCCESS": "Schema fetched",
         "ERROR": "Failed to fetch schema",
     },
-    "include_fields": {
-        "schema_name",
-        "schema_version",
-    },
+    "include_fields": {"schema_name", "schema_version"},
     "annotation_key": "GetSchema",
     "logger": logger,
     "tracer": tracer,

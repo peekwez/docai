@@ -61,10 +61,13 @@ def process_docai(
         logger.error(messages["ERROR"], error=err.log_dict())
         tracer.put_annotation(annotation_key, "FAILED")
         return {"statusCode": 400, "body": err.json()}
+
     except Exception as e:
         err = error.process_error(e)
         logger.error(messages["ERROR"], error=err.log_dict())
         tracer.put_annotation(annotation_key, "FAILED")
-        raise e
+        logger.exception(e)
+        return {"statusCode": 500, "body": err.json()}
+        # raise e
 
     return {"body": ret.json()}

@@ -51,42 +51,6 @@ class MimeTypeEnum(StrEnum):
     TIFF = "image/tiff"
 
 
-def is_image(mime_type: str) -> bool:
-    """Check if mime type is an image"""
-    return mime_type in (
-        MimeTypeEnum.PNG.value,
-        MimeTypeEnum.JPG.value,
-        MimeTypeEnum.JPEG.value,
-        MimeTypeEnum.GIF.value,
-        MimeTypeEnum.BMP.value,
-        MimeTypeEnum.TIFF.value,
-    )
-
-
-def is_pdf(mime_type: str) -> bool:
-    """Check if mime type is a PDF"""
-    return mime_type == MimeTypeEnum.PDF.value
-
-
-def is_text(mime_type: str) -> bool:
-    """Check if mime type is a PDF"""
-    return mime_type == MimeTypeEnum.TXT.value
-
-
-class DocumentModel(BaseModel):
-    content: str
-    mime_type: MimeTypeEnum
-
-    def is_text(self) -> bool:
-        return is_text(self.mime_type)
-
-    def is_image(self) -> bool:
-        return is_image(self.mime_type)
-
-    def is_pdf(self) -> bool:
-        return is_pdf(self.mime_type)
-
-
 class SchemaModel(BaseModel):
     schema_name: str
     schema_description: str

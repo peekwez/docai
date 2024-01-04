@@ -37,7 +37,7 @@ def count_tokens(string: str) -> int:
     return len(encode(string))
 
 
-def load_pdf(data: str) -> list[str]:
+def load_pdf(data: str) -> list[bytes]:
     """Given a base64 encoded string, return the contents of document into multiple images"""
     decoded = base64.b64decode(data)
     pages = convert_from_bytes(decoded, 300, thread_count=6)
@@ -45,14 +45,16 @@ def load_pdf(data: str) -> list[str]:
     for page in pages:
         fp = io.BytesIO()
         page.save(fp, format="JPEG")
-        base64_data = base64.b64encode(fp.getvalue()).decode("utf-8")
-        images.append(f"data:image/jpeg;base64,{base64_data}")
+        images.append(fp.getvalue())
+        # base64_data = base64.b64encode(fp.getvalue()).decode("utf-8")
+        # images.append(f"data:image/jpeg;base64,{base64_data}")
     return images
 
 
-def load_image(data: str) -> list[str]:
+def load_image(data: str) -> list[bytes]:
     """Given a base64 encoded string, return the contents of the image as a list of base64 string."""
-    return [data]
+    return [base64.b64decode(data)]
+    # return [f"data:image/jpeg;base64,{data}"]
 
 
 def validate_data(data_object: str, schema_definition: dict) -> dict:
@@ -77,21 +79,39 @@ class Config:
         self.__ssm = boto3.client("ssm")
         self.__sm = boto3.client("secretsmanager")
 
-    def get_parameter(self, name: str) -> str:
+    def get_parameter(self, parameter_suffix: str) -> str:
         """Get a parameter from SSM"""
-        return self.__ssm.get_parameter(Name=f"/{c.STAGE}" + name)["Parameter"]["Value"]
+        name = f"/{c.STAGE}" + parameter_suffix
+        return self.__ssm.get_parameter(Name=name)["Parameter"]["Value"]
 
-    def get_secret(self, name: str) -> str:
+    def get_secret(self, parameter_suffix: str) -> str:
         """Get a secret from Secrets Manager"""
-        return self.__sm.get_secret_value(SecretId=name)["SecretString"]
+        secret_name = self.get_parameter(parameter_suffix)
+        return self.__sm.get_secret_value(SecretId=secret_name)["SecretString"]
 
 
 class Resource:
     def __init__(self):
-        self.__session = boto3.Session()
         self.__config = Config()
 
     def get_table(self, parameter_name: str) -> boto3.resource:
         """Get a DynamoDB table resource"""
         table_name = self.__config.get_parameter(parameter_name)
-        return self.__session.resource("dynamodb").Table(table_name)
+        return boto3.resource("dynamodb").Table(table_name)
+
+    def get_bucket(self, parameter_name: str) -> boto3.resource:
+        """Get a S3 bucket resource"""
+        bucket_name = self.__config.get_parameter(parameter_name)
+        return boto3.resource("s3").Bucket(bucket_name)
+
+    def get_queue(self, parameter_name: str) -> boto3.resource:
+        """Get a SQS queue resource"""
+        queue_name = self.__config.get_parameter(parameter_name)
+        return boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
+
+    def get_s3(self) -> boto3.client:
+        from botocore.client import Config
+
+        endpoint_url = f"https://s3.{c.AWS_REGION}.amazonaws.com"
+        config = Config(signature_version="s3v4", s3={"addressing_style": "virtual"})
+        return boto3.client("s3", endpoint_url=endpoint_url, config=config)

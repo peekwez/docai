@@ -78,4 +78,12 @@ LAMBDA_PARAMS = {
         service="Extract",
         namespace="ServerlessDocumentAI",
     ),
+    "extract-data-batch": Params(
+        http_method="POST",
+        http_path="extract-data-batch",
+        function_name="ExtractDataBatch",
+        function_path="extract_data_batch",
+        service="Extract",
+        namespace="ServerlessDocumentAI",
+    ),
 }
