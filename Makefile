@@ -1,8 +1,14 @@
+synth: synth.resources
+
 deploy: deploy.resources
 
 destroy: destroy.resources
 
 invoke: invoke.create-schema
+
+synth.resources:
+	$(info [+] Synthesizing resources...)
+	$(MAKE) -C resources/ synth
 
 deploy.resources:
 	$(info [+] Deploying resources...)

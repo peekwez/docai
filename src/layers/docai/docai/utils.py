@@ -1,6 +1,8 @@
 import base64
+import datetime
 import io
 import json
+import os
 import random
 import re
 import string
@@ -13,6 +15,11 @@ from pdf2image import convert_from_bytes
 from docai import constants as c
 from docai import exceptions as exc
 
+
+class MissingEnvironmentVariable(Exception):
+    pass
+
+
 alphabet = string.ascii_lowercase + string.digits + string.ascii_uppercase
 tokenizer = tiktoken.get_encoding("cl100k_base")
 
@@ -20,6 +27,19 @@ tokenizer = tiktoken.get_encoding("cl100k_base")
 def guid(length: int = 10) -> str:
     """Generate a random string of fixed length"""
     return "".join(random.choices(alphabet, k=length))
+
+
+def utcnow():
+    """Return the current UTC time in ISO format"""
+    return datetime.datetime.utcnow().isoformat()
+
+
+def getenv(name: str) -> str:
+    """Get an environment variable"""
+    try:
+        return os.environ[name]
+    except KeyError:
+        raise MissingEnvironmentVariable(f"Missing environment variable {name}")
 
 
 def encode(string: str) -> list[int]:
@@ -77,36 +97,41 @@ def validate_data(data_object: str, schema_definition: dict) -> dict:
 class Config:
     def __init__(self):
         self.__ssm = boto3.client("ssm")
-        self.__sm = boto3.client("secretsmanager")
 
-    def get_parameter(self, parameter_suffix: str) -> str:
+    def __call__(self, param_env_name: str) -> str:
         """Get a parameter from SSM"""
-        name = f"/{c.STAGE}" + parameter_suffix
-        return self.__ssm.get_parameter(Name=name)["Parameter"]["Value"]
+        parameter_name = getenv(param_env_name)
+        return self.__ssm.get_parameter(Name=parameter_name)["Parameter"]["Value"]
 
-    def get_secret(self, parameter_suffix: str) -> str:
+
+class Secrets:
+    def __init__(self):
+        self.__sm = boto3.client("secretsmanager")
+        self.__config = Config()
+
+    def __call__(self, param_env_name: str) -> str:
         """Get a secret from Secrets Manager"""
-        secret_name = self.get_parameter(parameter_suffix)
+        secret_name = self.__config(param_env_name)
         return self.__sm.get_secret_value(SecretId=secret_name)["SecretString"]
 
 
-class Resource:
+class Resources:
     def __init__(self):
         self.__config = Config()
 
-    def get_table(self, parameter_name: str) -> boto3.resource:
+    def get_table(self, param_env_name: str) -> boto3.resource:
         """Get a DynamoDB table resource"""
-        table_name = self.__config.get_parameter(parameter_name)
+        table_name = self.__config(param_env_name)
         return boto3.resource("dynamodb").Table(table_name)
 
-    def get_bucket(self, parameter_name: str) -> boto3.resource:
+    def get_bucket(self, param_env_name: str) -> boto3.resource:
         """Get a S3 bucket resource"""
-        bucket_name = self.__config.get_parameter(parameter_name)
+        bucket_name = self.__config(param_env_name)
         return boto3.resource("s3").Bucket(bucket_name)
 
-    def get_queue(self, parameter_name: str) -> boto3.resource:
+    def get_queue(self, param_env_name: str) -> boto3.resource:
         """Get a SQS queue resource"""
-        queue_name = self.__config.get_parameter(parameter_name)
+        queue_name = self.__config(param_env_name)
         return boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
 
     def get_s3(self) -> boto3.client:

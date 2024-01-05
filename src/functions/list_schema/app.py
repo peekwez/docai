@@ -13,7 +13,9 @@ logger = Logger()
 tracer = Tracer()
 metrics = Metrics()
 
-table = utils.Resource().get_table("/env/schema/table/name")
+resources = utils.Resources()
+schema_table = resources.get_table("SCHEMA_TABLE_PARAMETER_NAME")
+
 params = {
     "validation_model": RequestModel,
     "messages": {
@@ -31,7 +33,7 @@ params = {
 
 @tracer.capture_method
 def list_schema(req: dict):
-    data = table.query(
+    data = schema_table.query(
         KeyConditionExpression="schema_name = :schema_name",
         FilterExpression="schema_status <> :schema_status",
         ExpressionAttributeValues={

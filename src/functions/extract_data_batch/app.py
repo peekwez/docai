@@ -4,20 +4,6 @@ from aws_lambda_powertools.utilities.parser import BaseModel, Field
 from docai import exceptions as exc
 from docai import middleware, stream, utils
 
-logger = Logger()
-tracer = Tracer()
-metrics = Metrics()
-
-config = utils.Config()
-resource = utils.Resource()
-
-bucket_name = config.get_parameter("/env/bucket/name")
-schema_table = resource.get_table("/env/schema/table/name")
-extract_table = resource.get_table("/env/extract/table/name")
-monitor_table = resource.get_table("/env/monitor/table/name")
-batch_queue = resource.get_queue("/env/batch/queue/name")
-s3_client = resource.get_s3()
-
 
 class RequestModel(BaseModel):
     schema_name: str = Field(..., min_length=4, max_length=64)
@@ -31,6 +17,21 @@ class PayloadModel(BaseModel):
     schema_definition: dict
     text_data: str
     image_list: list[str] | None = None
+
+
+logger = Logger()
+tracer = Tracer()
+metrics = Metrics()
+
+config = utils.Config()
+bucket_name = config("FILES_BUCKET_PARAMETER_NAME")
+
+resources = utils.Resources()
+s3_client = resources.get_s3()
+schema_table = resources.get_table("SCHEMA_TABLE_PARAMETER_NAME")
+result_table = resources.get_table("RESULT_TABLE_PARAMETER_NAME")
+monitor_table = resources.get_table("MONITOR_TABLE_PARAMETER_NAME")
+batch_queue = resources.get_queue("BATCH_DATA_QUEUE_PARAMETER_NAME")
 
 
 params = {
@@ -63,11 +64,15 @@ def queue_batch_extraction(request_id: str, req: dict):
         )
         payload = PayloadModel(request_id=request_id, **params)
         batch_queue.send_message(MessageBody=payload.json())
-        monitor_table.put_item(Item=dict(request_id=request_id, status="QUEUED"))
+        monitor_table.put_item(
+            Item=dict(request_id=request_id, status="QUEUED", created_at=utils.utcnow())
+        )
     except Exception as e:
         error = dict(error_name=e.__class__.__name__, error_message=str(e))
-        extract_table.put_item(Item=dict(request_id=request_id, **key, error=error))
-        monitor_table.put_item(Item=dict(request_id=request_id, status="FAILED"))
+        result_table.put_item(Item=dict(request_id=request_id, **key, error=error))
+        monitor_table.put_item(
+            Item=dict(request_id=request_id, status="FAILED", created_at=utils.utcnow())
+        )
         raise e
     return {"request_id": request_id, "status": "QUEUED", "data": None}
 

@@ -17,7 +17,8 @@ logger = Logger()
 tracer = Tracer()
 metrics = Metrics()
 
-table = utils.Resource().get_table("/env/schema/table/name")
+resources = utils.Resources()
+schema_table = resources.get_table("SCHEMA_TABLE_PARAMETER_NAME")
 
 params = {
     "validation_model": RequestModel,
@@ -36,7 +37,7 @@ params = {
 
 @tracer.capture_method
 def get_schema(req: dict):
-    data = table.get_item(Key=req).get("Item")
+    data = schema_table.get_item(Key=req).get("Item")
     if not data:
         raise exc.SchemaDoesNotExist
 

@@ -1,5 +1,4 @@
 from aws_lambda_powertools import Logger, Metrics, Tracer
-from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 from aws_lambda_powertools.utilities.parser import BaseModel, Field
 
 from docai import middleware, models, utils
@@ -15,7 +14,9 @@ logger = Logger()
 tracer = Tracer()
 metrics = Metrics()
 
-table = utils.Resource().get_table("/env/schema/table/name")
+resources = utils.Resources()
+schema_table = resources.get_table("SCHEMA_TABLE_PARAMETER_NAME")
+
 params = {
     "validation_model": RequestModel,
     "messages": {
@@ -34,7 +35,7 @@ params = {
 @tracer.capture_method
 def create_schema(req: dict):
     schema = models.SchemaModel(**req)
-    table.put_item(Item=schema.dict())
+    schema_table.put_item(Item=schema.dict())
     return schema.dict(include={"schema_name", "schema_version", "number_of_tokens"})
 
 

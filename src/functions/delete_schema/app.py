@@ -14,7 +14,9 @@ logger = Logger()
 tracer = Tracer()
 metrics = Metrics()
 
-table = utils.Resource().get_table("/env/schema/table/name")
+resources = utils.Resources()
+schema_table = resources.get_table("SCHEMA_TABLE_PARAMETER_NAME")
+
 params = {
     "validation_model": RequestModel,
     "messages": {
@@ -31,14 +33,14 @@ params = {
 
 
 def delete_schema(req: dict):
-    data = table.get_item(Key=req).get("Item")
+    data = schema_table.get_item(Key=req).get("Item")
     if not data:
         raise exc.SchemaDoesNotExist
 
     if data["schema_status"] == models.SchemaStatus.DELETED.value:
         raise exc.SchemaDoesNotExist
 
-    table.update_item(
+    schema_table.update_item(
         Key=req,
         UpdateExpression="SET schema_status = :schema_status",
         ExpressionAttributeValues={":schema_status": models.SchemaStatus.DELETED.value},
