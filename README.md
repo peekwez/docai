@@ -349,7 +349,8 @@ These endpoints are used to extract data from documents using a predefined schem
 For `image/*` and `application/pdf` documents, the content is first converted to
 a `base64` string and then passed to the API. The API will then convert the `base64` content
 to an image and then extract the data from the image. For `text/plain` documents, the
-content is passed directly to the API.
+content is passed directly to the API. Check out `samples/b64string` folder for
+sample base64 data for testing the api
 
 #### Extract Data
 

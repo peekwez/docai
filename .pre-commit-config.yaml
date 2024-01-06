@@ -12,7 +12,9 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
       - id: trailing-whitespace
+        exclude: README.pdf
       - id: end-of-file-fixer
+        exclude: README.pdf
       - id: no-commit-to-branch
   # - repo: https://github.com/PyCQA/flake8
   #   rev: 6.1.0
