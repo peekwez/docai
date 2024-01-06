@@ -57,6 +57,9 @@ class TablesStack(cdk.NestedStack):
             partition_key=dynamodb.Attribute(
                 name="request_id", type=dynamodb.AttributeType.STRING
             ),
+            sort_key=dynamodb.Attribute(
+                name="created_at", type=dynamodb.AttributeType.STRING
+            ),
         )
 
         self.monitor_param = ssm.StringParameter(

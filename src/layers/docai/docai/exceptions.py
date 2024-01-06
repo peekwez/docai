@@ -26,10 +26,16 @@ class InvalidData(Exception):
         super().__init__(message)
 
 
+class RequestDoesNotExist(Exception):
+    def __init__(self, message="Request does not exist."):
+        super().__init__(message)
+
+
 EXCEPTIONS = (
     InvalidData,
     InvalidMimeType,
     ValidationError,
+    RequestDoesNotExist,
     SchemaDoesNotExist,
     SchemaDefinitionTooLarge,
 )

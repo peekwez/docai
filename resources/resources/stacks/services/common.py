@@ -57,7 +57,9 @@ class APIStack(cdk.NestedStack):
         self, fn: _lambda.Function, http_method: str, http_path: str
     ) -> None:
         fn_path = self.api.root.add_resource(http_path)
-        fn_path.add_method(http_method, apigw.LambdaIntegration(fn))
+        fn_path.add_method(
+            http_method, apigw.LambdaIntegration(fn), api_key_required=True
+        )
 
     def create_api_key(self, quota: int = 10000) -> None:
         usage_plan = apigw.UsagePlan(

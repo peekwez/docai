@@ -38,8 +38,21 @@ class ExtractServiceStack(cdk.NestedStack):
         self.__add_extract_data_batch(
             tables_stack=tables_stack,
             buckets_stack=buckets_stack,
+            queues_stack=queues_stack,
+            layers_stack=layers_stack,
+            api_stack=api_stack,
+        )
+
+        self.__add_extract_data_batch_run(
+            tables_stack=tables_stack,
+            buckets_stack=buckets_stack,
             secrets_stack=secrets_stack,
             queues_stack=queues_stack,
+            layers_stack=layers_stack,
+        )
+
+        self.__add_get_result(
+            tables_stack=tables_stack,
             layers_stack=layers_stack,
             api_stack=api_stack,
         )
@@ -91,7 +104,6 @@ class ExtractServiceStack(cdk.NestedStack):
         self,
         tables_stack: TablesStack,
         buckets_stack: BucketsStack,
-        secrets_stack: SecretsStack,
         queues_stack: QueuesStack,
         layers_stack: LayersStack,
         api_stack: APIStack,
@@ -128,10 +140,69 @@ class ExtractServiceStack(cdk.NestedStack):
             self.extract_data_batch.role,
             ["sqs:SendMessage", "sqs:GetQueueUrl"],
         )
-        secrets_stack.add_access_to_openai_secret(
-            self.extract_data_batch.fn,
-            self.extract_data_batch.role,
-            ["secretsmanager:GetSecretValue"],
-        )
         layers_stack.add_docai_layer(self.extract_data_batch.fn)
         api_stack.add_endpoint(self.extract_data_batch.fn, "POST", "extract-data-batch")
+
+    def __add_extract_data_batch_run(
+        self,
+        tables_stack: TablesStack,
+        buckets_stack: BucketsStack,
+        secrets_stack: SecretsStack,
+        queues_stack: QueuesStack,
+        layers_stack: LayersStack,
+    ):
+        self.extract_data_batch_run = FunctionWithRoleAndDLQ(
+            self,
+            "ExtractDataBatchRun",
+            service=SERVICE,
+            namespace=NAMESPACE,
+            asset_suffix="functions/extract_data_batch_run",
+        )
+        tables_stack.add_access_to_result_table(
+            self.extract_data_batch_run.fn,
+            self.extract_data_batch_run.role,
+            ["dynamodb:PutItem"],
+        )
+        tables_stack.add_access_to_monitor_table(
+            self.extract_data_batch_run.fn,
+            self.extract_data_batch_run.role,
+            ["dynamodb:PutItem"],
+        )
+        buckets_stack.add_access_to_files_bucket(
+            self.extract_data_batch_run.fn,
+            self.extract_data_batch_run.role,
+            ["s3:*Object", "s3:ListBucket"],
+        )
+        secrets_stack.add_access_to_openai_secret(
+            self.extract_data_batch_run.fn,
+            self.extract_data_batch_run.role,
+            ["secretsmanager:GetSecretValue"],
+        )
+        layers_stack.add_docai_layer(self.extract_data_batch_run.fn)
+        queues_stack.add_batch_data_as_event_source(self.extract_data_batch_run.fn)
+
+    def __add_get_result(
+        self,
+        tables_stack: TablesStack,
+        layers_stack: LayersStack,
+        api_stack: APIStack,
+    ):
+        self.get_result = FunctionWithRoleAndDLQ(
+            self,
+            "GetResult",
+            service=SERVICE,
+            namespace=NAMESPACE,
+            asset_suffix="functions/get_result",
+        )
+        tables_stack.add_access_to_result_table(
+            self.get_result.fn,
+            self.get_result.role,
+            ["dynamodb:GetItem"],
+        )
+        tables_stack.add_access_to_monitor_table(
+            self.get_result.fn,
+            self.get_result.role,
+            ["dynamodb:Query"],
+        )
+        layers_stack.add_docai_layer(self.get_result.fn)
+        api_stack.add_endpoint(self.get_result.fn, "POST", "get-result")

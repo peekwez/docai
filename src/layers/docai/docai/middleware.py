@@ -54,20 +54,21 @@ def process_docai(
         logger.info(messages["SUCCESS"], result=data)
         tracer.put_annotation(annotation_key, "SUCCESS")
         tracer.put_metadata(annotation_key, data)
-        metrics.add_metric(annotation_key, unit=MetricUnit.Count, value=1)
+        metrics.add_metric(f"{annotation_key}Success", unit=MetricUnit.Count, value=1)
 
     except exc.EXCEPTIONS as e:
         err = error.process_error(e)
         logger.error(messages["ERROR"], error=err.log_dict())
         tracer.put_annotation(annotation_key, "FAILED")
+        metrics.add_metric(f"{annotation_key}Failed", unit=MetricUnit.Count, value=1)
         return {"statusCode": 400, "body": err.json()}
 
     except Exception as e:
         err = error.process_error(e)
         logger.error(messages["ERROR"], error=err.log_dict())
         tracer.put_annotation(annotation_key, "FAILED")
+        metrics.add_metric(f"{annotation_key}Failed", unit=MetricUnit.Count, value=1)
         logger.exception(e)
         return {"statusCode": 500, "body": err.json()}
-        # raise e
 
     return {"body": ret.json()}

@@ -13,10 +13,21 @@ class RequestModel(BaseModel):
 
 
 class PayloadModel(BaseModel):
-    request_id: str
     schema_definition: dict
     text_data: str
     image_list: list[str] | None = None
+
+
+class KeyModel(BaseModel):
+    schema_name: str
+    schema_version: str
+
+
+class EventModel(BaseModel):
+    request_id: str
+    key: KeyModel
+    payload: PayloadModel
+    created_at: str = Field(default_factory=utils.utcnow)
 
 
 logger = Logger()
@@ -59,22 +70,21 @@ def queue_batch_extraction(request_id: str, req: dict):
         raise exc.SchemaDoesNotExist
 
     try:
-        params = stream.prepare_extraction_request(
+        payload = stream.prepare_extraction_request(
             schema, document, s3_client, bucket_name
         )
-        payload = PayloadModel(request_id=request_id, **params)
-        batch_queue.send_message(MessageBody=payload.json())
-        monitor_table.put_item(
-            Item=dict(request_id=request_id, status="QUEUED", created_at=utils.utcnow())
-        )
+        event = EventModel(request_id=request_id, key=key, payload=payload)
+        state = dict(request_id=request_id, status="QUEUED", created_at=utils.utcnow())
+        batch_queue.send_message(MessageBody=event.json())
+        monitor_table.put_item(Item=state)
     except Exception as e:
         error = dict(error_name=e.__class__.__name__, error_message=str(e))
         result_table.put_item(Item=dict(request_id=request_id, **key, error=error))
-        monitor_table.put_item(
-            Item=dict(request_id=request_id, status="FAILED", created_at=utils.utcnow())
-        )
+        state = dict(request_id=request_id, status="FAILED", created_at=utils.utcnow())
+        monitor_table.put_item(Item=state)
         raise e
-    return {"request_id": request_id, "status": "QUEUED", "data": None}
+
+    return state
 
 
 @metrics.log_metrics(capture_cold_start_metric=True)

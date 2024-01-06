@@ -1,6 +1,4 @@
-import base64
 import datetime
-import io
 import json
 import os
 import random
@@ -10,7 +8,6 @@ import string
 import boto3
 import tiktoken
 from jsonschema import Draft202012Validator as Validator
-from pdf2image import convert_from_bytes
 
 from docai import constants as c
 from docai import exceptions as exc
@@ -55,26 +52,6 @@ def decode(tokens: list[int]) -> str:
 def count_tokens(string: str) -> int:
     """Count the number of tokens in a string"""
     return len(encode(string))
-
-
-def load_pdf(data: str) -> list[bytes]:
-    """Given a base64 encoded string, return the contents of document into multiple images"""
-    decoded = base64.b64decode(data)
-    pages = convert_from_bytes(decoded, 300, thread_count=6)
-    images = []
-    for page in pages:
-        fp = io.BytesIO()
-        page.save(fp, format="JPEG")
-        images.append(fp.getvalue())
-        # base64_data = base64.b64encode(fp.getvalue()).decode("utf-8")
-        # images.append(f"data:image/jpeg;base64,{base64_data}")
-    return images
-
-
-def load_image(data: str) -> list[bytes]:
-    """Given a base64 encoded string, return the contents of the image as a list of base64 string."""
-    return [base64.b64decode(data)]
-    # return [f"data:image/jpeg;base64,{data}"]
 
 
 def validate_data(data_object: str, schema_definition: dict) -> dict:
@@ -135,6 +112,7 @@ class Resources:
         return boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
 
     def get_s3(self) -> boto3.client:
+        """Get a S3 client"""
         from botocore.client import Config
 
         endpoint_url = f"https://s3.{c.AWS_REGION}.amazonaws.com"

@@ -1,7 +1,7 @@
 boto3
 tiktoken
 requests
-pdf2image
+pymupdf
 aws-lambda-powertools[parser,tracer]
 jsonschema
 openai

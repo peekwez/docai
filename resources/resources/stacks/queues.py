@@ -1,6 +1,7 @@
 import aws_cdk as cdk
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as _lambda
+from aws_cdk import aws_lambda_event_sources as lambda_event_sources
 from aws_cdk import aws_sqs as sqs
 from aws_cdk import aws_ssm as ssm
 from constructs import Construct
@@ -48,5 +49,13 @@ class QueuesStack(cdk.NestedStack):
                 effect=iam.Effect.ALLOW,
                 actions=["ssm:GetParameter"],
                 resources=[self.batch_data_param.parameter_arn],
+            )
+        )
+
+    def add_batch_data_as_event_source(self, fn: _lambda.Function):
+        fn.add_event_source(
+            lambda_event_sources.SqsEventSource(
+                self.batch_data,
+                batch_size=10,
             )
         )
