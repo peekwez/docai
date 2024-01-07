@@ -1,8 +1,11 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../../ai/mortgage-evaluation-agents"
+    }
+  ],
+  "settings": {}
 }

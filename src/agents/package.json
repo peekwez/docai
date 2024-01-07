@@ -1,0 +1,17 @@
+{
+  "name": "docai-agents",
+  "version": "1.0.0",
+  "description": "A set of nodeJS agents for document extraction based on Open AIs GPT models",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kwesi P Apponsah",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1531.0",
+    "openai": "^4.24.1",
+    "uuid4": "^2.0.3"
+  }
+}
