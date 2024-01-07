@@ -48,7 +48,7 @@
 
 ### User Message
 
-> I want to extract the name, email, phone number date, gender, and phone number from a resume
+> I want to extract the name, email, phone number, date of birth, and gender from a resume.
 
 ### Agent Response
 
@@ -73,9 +73,9 @@
       "type": ["string", "null"],
       "description": "The phone number of the candidate on the resume."
     },
-    "date": {
+    "date_of_birth": {
       "type": ["string", "null"],
-      "format": "date_of_birth",
+      "format": "date",
       "description": "The date of birth of the candidate on the resume in YYYY-MM-DD format. For example if the date of birth is 1st January 1990, the value should be `1990-01-01`."
     },
     "gender": {

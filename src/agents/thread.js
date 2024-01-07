@@ -2,7 +2,7 @@ import fs from "fs";
 import uuid4 from "uuid4";
 import OpenAI from "openai";
 
-import { getAgentProperties } from "./agents.js";
+import { agentProperties } from "./agents.js";
 
 const openai = new OpenAI();
 
@@ -15,8 +15,8 @@ async function startThread({ userId, agentName, memorySize = 20 }) {
   // Create a new thread object
 
   // Get the agent properties
-  const agentProps = await getAgentProperties();
-  const { systemMessage, saveResult: saveAgentResult } = agentProps[agentName];
+  const { systemMessage, saveResult: saveAgentResult } =
+    agentProperties[agentName];
 
   // Create the thread object
   const thread = {
@@ -35,7 +35,7 @@ async function startThread({ userId, agentName, memorySize = 20 }) {
     },
     saveThread: async function () {
       // Save the thread data to a file or database
-      let fileName = `thread-${this.threadId}.json`;
+      let fileName = `./tmp/thread-${this.threadId}.json`;
       let body = {
         user_id: this.userId,
         thread_id: this.threadId,

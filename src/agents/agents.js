@@ -19,7 +19,7 @@ async function saveSchemaBuilderAgentData(
   }
 
   let id = uuid4();
-  let fileName = `schema-${id}.json`;
+  let fileName = `./tmp/schema-${id}.json`;
   let body = {
     schema_name: schemaName,
     schema_description: schemaDescription,
@@ -29,7 +29,7 @@ async function saveSchemaBuilderAgentData(
   fs.writeFileSync(fileName, fileContents);
 }
 
-const agentResultSaveFunctions = {
+const agentSaveResultFunctions = {
   "schema-builder": saveSchemaBuilderAgentData,
 };
 
@@ -46,11 +46,12 @@ async function getAgentProperties() {
     let fileName = file.replace(FILE_EXTENSION, "");
     agentProps[fileName] = {
       systemMessage: content,
-      saveResult: agentResultSaveFunctions[fileName],
+      saveResult: agentSaveResultFunctions[fileName],
     };
   });
 
   return agentProps;
 }
 
-export { getAgentProperties };
+const agentProperties = await getAgentProperties();
+export { agentProperties };
