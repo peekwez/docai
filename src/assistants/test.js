@@ -1,7 +1,7 @@
 import { startThread } from "./thread.js";
 
 const runTest = async () => {
-  const thread = await startThread({ agentName: "schema-builder" });
+  const thread = await startThread({ assistantName: "schema-builder" });
 
   let firstMessage =
     "Create a schema to extract the name of an employee from a letter of employment";
@@ -25,11 +25,17 @@ const runTest = async () => {
   await thread.addMessage(secondMessage);
   await thread.streamResult();
 
-  await thread.saveThread();
-  await thread.saveResult(
-    "test-loe-schema",
-    "This schema is a schema for extracting data from a letter of employment."
-  );
+  const threadFileName =
+    "/Users/kwesi/Desktop/projects/docai/src/agents/tmp/thread-1.json";
+  await thread.saveThread(threadFileName);
+
+  const schemaName = "test-loe-schema";
+  const schemaDescription =
+    "This schema is a schema for extracting data from a letter of employment.";
+  const schemaFileName =
+    "/Users/kwesi/Desktop/projects/docai/src/agents/tmp/schema-1.json";
+  await thread.saveResult(schemaName, schemaDescription, schemaFileName);
+  1;
 };
 
 await runTest();

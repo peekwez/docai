@@ -2,45 +2,42 @@ import fs from "fs";
 import uuid4 from "uuid4";
 import OpenAI from "openai";
 
-import { agentProperties } from "./agents.js";
+import { Config } from "./utils.js";
+import { assistants } from "./assistants/index.js";
 
-const openai = new OpenAI();
-
-const GPT_MODEL = "gpt-4-1106-preview";
 const USER_ROLE = "user";
 const SYSTEM_ROLE = "system";
 const ASSISTANT_ROLE = "assistant";
+const GPT_MODEL = "gpt-4-1106-preview";
 
-async function startThread({ userId, agentName, memorySize = 20 }) {
+const config = new Config();
+const openai = new OpenAI({
+  apiKey: await config.getSecretValue("/dev/secret/openai/api_key"),
+});
+
+async function startThread({ userId, assistantName, memorySize = 20 }) {
   // Create a new thread object
 
-  // Get the agent properties
-  const { systemMessage, saveResult: saveAgentResult } =
-    agentProperties[agentName];
-
-  // Create the thread object
   const thread = {
     userId: userId || uuid4(),
     threadId: uuid4(),
-    agentName: agentName,
+    assistant: assistants[assistantName],
     memorySize: memorySize,
-    systemMessage: systemMessage,
     chatHistory: [],
     latestResult: {},
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     stream: null,
     saveResult: async function (...props) {
-      saveAgentResult(this.latestResult, ...props);
+      this.assistant.saveResult(this.latestResult, ...props);
     },
-    saveThread: async function () {
+    saveThread: async function (fileName) {
       // Save the thread data to a file or database
-      let fileName = `./tmp/thread-${this.threadId}.json`;
       let body = {
         user_id: this.userId,
         thread_id: this.threadId,
         agent_name: this.agentName,
-        system_message: this.systemMessage,
+        system_message: this.assistant.systemMessage,
         chat_history: this.chatHistory,
         latest_result: this.latestResult,
         created_at: this.createdAt,
@@ -86,7 +83,7 @@ async function startThread({ userId, agentName, memorySize = 20 }) {
 
       // Create messages for OpenAI
       let messages = [
-        { role: SYSTEM_ROLE, content: this.systemMessage },
+        { role: SYSTEM_ROLE, content: this.assistant.systemMessage },
         ...this.chatHistory,
       ];
 

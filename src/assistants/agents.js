@@ -2,7 +2,9 @@ import fs from "fs";
 import uuid4 from "uuid4";
 
 const FILE_EXTENSION = ".md";
-const PROMPT_DIRECTORY = "prompts";
+const PACKAGE_HOME = "/Users/kwesi/Desktop/projects/docai/src/agents";
+const PROMPT_DIRECTORY = `${PACKAGE_HOME}/prompts`;
+const TMP_DIRECTORY = `${PACKAGE_HOME}/tmp`;
 
 async function saveSchemaBuilderAgentData(
   rawString,
@@ -19,7 +21,7 @@ async function saveSchemaBuilderAgentData(
   }
 
   let id = uuid4();
-  let fileName = `./tmp/schema-${id}.json`;
+  let fileName = `${TMP_DIRECTORY}/schema-${id}.json`;
   let body = {
     schema_name: schemaName,
     schema_description: schemaDescription,
@@ -37,12 +39,12 @@ async function getAgentProperties() {
   // Get all markdown files in the prompts directory
   // and return them as a dictionary of file name to file contents
 
-  var files = fs.readdirSync(`./${PROMPT_DIRECTORY}`);
+  var files = fs.readdirSync(`${PROMPT_DIRECTORY}`);
   var textFiles = files.filter((file) => file.endsWith(FILE_EXTENSION));
 
   var agentProps = {};
   textFiles.forEach((file) => {
-    let content = fs.readFileSync(`./${PROMPT_DIRECTORY}/${file}`, "utf-8");
+    let content = fs.readFileSync(`${PROMPT_DIRECTORY}/${file}`, "utf-8");
     let fileName = file.replace(FILE_EXTENSION, "");
     agentProps[fileName] = {
       systemMessage: content,

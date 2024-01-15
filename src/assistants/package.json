@@ -1,5 +1,5 @@
 {
-  "name": "docai-agents",
+  "name": "docai-assistants",
   "version": "1.0.0",
   "description": "A set of nodeJS agents for document extraction based on Open AIs GPT models",
   "main": "index.js",

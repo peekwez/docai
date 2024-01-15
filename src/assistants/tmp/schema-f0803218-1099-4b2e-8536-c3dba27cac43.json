@@ -1,0 +1,59 @@
+{
+  "schema_name": "test-loe-schema",
+  "schema_description": "This schema is a schema for extracting data from a letter of employment.",
+  "schema_definition": {
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/employment-letter-salary-extraction.json",
+    "title": "Employment Letter Salary Extraction",
+    "type": "object",
+    "description": "This schema is used to extract the employee's name and salary details from an employment letter.",
+    "properties": {
+      "employee_name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "The full name of the employee as stated on the employment letter."
+      },
+      "employee_salary": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "The salary details of the employee including amount and frequency.",
+        "properties": {
+          "amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The monetary amount of the salary offered to the employee."
+          },
+          "frequency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "annually",
+              "monthly",
+              "biweekly",
+              "weekly",
+              "hourly"
+            ],
+            "description": "The frequency with which the employee is paid, such as annually, monthly, biweekly, weekly, or hourly."
+          }
+        },
+        "required": [
+          "amount",
+          "frequency"
+        ]
+      }
+    },
+    "required": [
+      "employee_name",
+      "employee_salary"
+    ],
+    "additionalProperties": false
+  }
+}
