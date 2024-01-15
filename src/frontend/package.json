@@ -40,6 +40,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"docai-assitants": "file:../assistants"
+		"docai-assistants": "file:../assistants"
 	}
 }
