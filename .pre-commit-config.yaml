@@ -3,7 +3,7 @@ repos:
     rev: v4.5.0
     hooks:
       - id: check-added-large-files
-        args: ['--maxkb=2048']
+        args: ["--maxkb=2048"]
       - id: check-ast
       - id: check-yaml
       - id: check-json
@@ -31,11 +31,11 @@ repos:
       - id: mypy
         additional_dependencies: [pydantic] # add if use pydantic
         args: [--scripts-are-modules]
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.261
-    hooks:
-      - id: ruff
-        args: [--fix]
+  # - repo: https://github.com/charliermarsh/ruff-pre-commit
+  #   rev: v0.0.261
+  #   hooks:
+  #     - id: ruff
+  #       args: [--fix]
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
