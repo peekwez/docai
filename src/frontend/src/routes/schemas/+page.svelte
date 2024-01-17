@@ -64,7 +64,7 @@
 	};
 
 	let getDataType = (field) => {
-		let type = { field };
+		let { type } = field;
 		if (typeof type === 'object') {
 			type = type.find((el) => el !== 'null');
 		}
