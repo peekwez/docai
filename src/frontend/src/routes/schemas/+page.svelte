@@ -13,69 +13,62 @@
 
 	import {
 		TrashCan,
-		CheckmarkFilled,
+		Email,
 		StringInteger,
 		StringText,
 		CalendarHeatMap,
 		Term,
 		Parameter
+		// CheckmarkFilled,
 	} from 'carbon-icons-svelte';
 
 	export let data;
+	const options = {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric'
+	};
 	const headers = [
 		{ key: 'schema_name', value: 'Name' },
 		{ key: 'schema_description', value: 'Description' },
 		{ key: 'schema_version', value: 'Version' },
 		{ key: 'number_of_tokens', value: 'Tokens' },
 		{ key: 'schema_definition', value: 'Fields' },
-		{ key: 'schema_status', value: 'Status' },
+		// { key: 'schema_status', value: 'Status' },
 		{
 			key: 'created_at',
 			value: 'Created At',
-			display: (value) => new Date(value).toLocaleString(),
+			display: (value) => new Date(value).toLocaleString('en-CA', options),
 			sort: (a, b) => new Date(a) - new Date(b)
 		}
 	];
 
 	let page = 1;
+	let pageSize = 10;
 	let { rows } = data;
 	let selectedRowIds = [];
-
-	let pageSize = 10;
-
 	let title = 'Schema Definitions';
 	let description =
 		"A collection of your organization's active schemas used for extracting structured data from documents. Use the dropdown menu to view the schema details.";
 
-	let typeIcons = {
-		string: StringText,
-		number: StringInteger,
-		date: CalendarHeatMap,
-		object: Parameter,
-		array: Term
+	let tagProps = {
+		string: { icon: StringText, type: 'blue' },
+		number: { icon: StringInteger, type: 'green' },
+		date: { icon: CalendarHeatMap, type: 'purple' },
+		object: { icon: Parameter, type: 'high-contrast' },
+		email: { icon: Email, type: 'red' },
+		array: { icon: Term, type: 'magenta' },
+		null: { icon: null, type: 'cyan' }
 	};
 
-	let typeColors = {
-		string: 'blue',
-		number: 'green',
-		date: 'purple',
-		object: 'high-contrast',
-		array: 'magenta'
-	};
-
-	let getDataType = (field) => {
-		let { type } = field;
+	let getTagProps = (field) => {
+		let { type, format } = field;
 		if (typeof type === 'object') {
 			type = type.find((el) => el !== 'null');
 		}
-		return type;
-	};
-	let typeIconsFn = (field) => {
-		return typeIcons[getDataType(field)];
-	};
-
-	let typeColorsFn = (field) => {
-		return typeColors[getDataType(field)];
+		return format ? tagProps[format] : tagProps[type];
 	};
 
 	$: console.log(selectedRowIds);
@@ -121,12 +114,8 @@
 	<svelte:fragment slot="cell" let:cell>
 		{#if cell.key === 'schema_definition'}
 			{#each Object.entries(cell.value.properties) as [field_name, field_object]}
-				{@const icon = typeIconsFn(field_object)}
-				{@const color = typeColorsFn(field_object)}
-				<Tag {icon} type={color}>{field_name}</Tag>
+				<Tag {...getTagProps(field_object)}>{field_name}</Tag>
 			{/each}
-		{:else if cell.key === 'schema_status'}
-			<CheckmarkFilled size={20} fill="green" />
 		{:else if cell.key == 'created_at'}
 			{cell.display(cell.value)}
 		{:else}
