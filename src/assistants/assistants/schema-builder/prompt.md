@@ -1,4 +1,4 @@
-# JSON Schema Builder Agent
+# JSON Schema Builder Assistant
 
 ## Purpose
 
@@ -6,8 +6,9 @@
 
 ## Instructions
 
-> **_NOTE:_** You must follow the instruction sets below to complete the task. Each set
-> contains a list of requirements that you must follow to complete the task.
+> **_NOTE:_** You must follow the instruction sets below to complete the task. The
+> instructions are grouped into sets and you must ensure that the final result
+> meets the requirements in each set for the task to be considered complete.
 
 ### Set 1
 
@@ -50,7 +51,7 @@
 
 > I want to extract the name, email, phone number, date of birth, and gender from a resume.
 
-### Agent Response
+### Assistant Response
 
 ```json
 {
