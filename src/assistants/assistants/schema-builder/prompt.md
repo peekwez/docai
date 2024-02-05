@@ -1,4 +1,4 @@
-# JSON Schema Builder Agent
+# JSON Schema Builder Assistant
 
 ## Purpose
 
@@ -50,7 +50,7 @@
 
 > I want to extract the name, email, phone number, date of birth, and gender from a resume.
 
-### Agent Response
+### Assistant Response
 
 ```json
 {
