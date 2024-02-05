@@ -1,5 +1,10 @@
 {
   "[python]": {
     "editor.formatOnPaste": false
-  }
+  },
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "editor.formatOnSave": true,
+  "eslint.validate": ["javascript", "svelte"]
 }

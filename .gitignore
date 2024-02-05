@@ -652,3 +652,4 @@ amplifytools.xcconfig
 #amplify-do-not-edit-end
 
 misc
+src/agents/tmp

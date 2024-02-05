@@ -109,7 +109,7 @@ class SchemaServiceStack(cdk.NestedStack):
         tables_stack.add_access_to_schema_table(
             self.list_schema.fn,
             self.list_schema.role,
-            ["dynamodb:Query"],
+            ["dynamodb:Query", "dynamodb:Scan"],
         )
         layers_stack.add_docai_layer(self.list_schema.fn)
         api_stack.add_endpoint(self.list_schema.fn, "POST", "list-schema")

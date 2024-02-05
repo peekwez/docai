@@ -1,9 +1,11 @@
 import datetime
+import decimal
 import json
 import os
 import random
 import re
 import string
+from typing import Any
 
 import boto3
 import tiktoken
@@ -26,7 +28,7 @@ def guid(length: int = 10) -> str:
     return "".join(random.choices(alphabet, k=length))
 
 
-def utcnow():
+def utcnow() -> str:
     """Return the current UTC time in ISO format"""
     return datetime.datetime.utcnow().isoformat()
 
@@ -54,15 +56,13 @@ def count_tokens(string: str) -> int:
     return len(encode(string))
 
 
-def validate_data(data_object: str, schema_definition: dict) -> dict:
+def validate_data(data_object: str, schema_definition: dict[str, Any]) -> dict[str, Any]:
     """Given a JSON string, and a schema definition return a validated JSON data."""
-    match = re.search(
-        r"\{.*\}", data_object.strip(), re.MULTILINE | re.IGNORECASE | re.DOTALL
-    )
+    match = re.search(r"\{.*\}", data_object.strip(), re.MULTILINE | re.IGNORECASE | re.DOTALL)
     output = ""
     if match:
         output = match.group()
-    data = json.loads(output, strict=False)
+    data = json.loads(output, strict=False, parse_float=decimal.Decimal)
 
     try:
         Validator(schema_definition).validate(data)
@@ -72,7 +72,7 @@ def validate_data(data_object: str, schema_definition: dict) -> dict:
 
 
 class Config:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__ssm = boto3.client("ssm")
 
     def __call__(self, param_env_name: str) -> str:
@@ -82,7 +82,7 @@ class Config:
 
 
 class Secrets:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__sm = boto3.client("secretsmanager")
         self.__config = Config()
 
@@ -93,7 +93,7 @@ class Secrets:
 
 
 class Resources:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__config = Config()
 
     def get_table(self, param_env_name: str) -> boto3.resource:
