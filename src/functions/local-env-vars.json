@@ -1,0 +1,10 @@
+{
+  "CreateSchemaLambda": {
+    "SCHEMA_TABLE_NAME": "SchemaStack-SchemaTable7EE5C707-R14LERP6GAYC",
+    "SCHEMA_TOPIC_NAME": "SchemaStack-SchemaTopic37CC9855-Jg5bVWS60UiP",
+    "SCHEMA_DLQ_NAME": "SchemaStack-SchemaDLQQueueC620D324-k65BgBtnBOvy",
+    "POWERTOOLS_SERVICE_NAME": "schema",
+    "POWERTOOLS_METRICS_NAMESPACE": "ServerlessDocumentAI",
+    "LOG_LEVEL": "INFO"
+  }
+}

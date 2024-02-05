@@ -1,0 +1,7 @@
+boto3
+tiktoken
+requests
+pymupdf
+aws-lambda-powertools[parser,tracer]
+jsonschema
+openai
