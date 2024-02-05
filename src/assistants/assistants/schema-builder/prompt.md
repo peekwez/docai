@@ -76,7 +76,7 @@
     "date_of_birth": {
       "type": ["string", "null"],
       "format": "date",
-      "description": "The date of birth of the candidate on the resume in YYYY-MM-DD format. For example if the date of birth is 1st January 1990, the value should be `1990-01-01`."
+      "description": "The date of birth of the candidate on the resume in YYYY-MM-DD format. For example if the date of birth is 1st February 1990, the value should be `1990-02-01`."
     },
     "gender": {
       "type": ["string", "null"],

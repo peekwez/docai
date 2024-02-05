@@ -7,10 +7,10 @@ AWS_REGION = os.environ.get("AWS_DEFAULT_REGION", "ca-central-1")
 # OpenAI parameters
 SEED = 43
 TEMPERATURE = 0
-TEXT_MODEL = "gpt-4-1106-preview"
-VISION_MODEL = "gpt-4-vision-preview"
-SCHEMA_TOKEN_LIMIT = 2048
-MAX_OUTPUT_TOKENS = 4096
+TEXT_MODEL = os.environ.get("TEXT_MODEL", "gpt-4-1106-preview")
+VISION_MODEL = os.environ.get("VISION_MODEL", "gpt-4-vision-preview")
+SCHEMA_TOKEN_LIMIT = os.environ.get("SCHEMA_TOKEN_LIMIT", 2048)
+MAX_OUTPUT_TOKENS = os.environ.get("SCHEMA_TOKEN_LIMIT", 4096)
 
 
 # Prompt templates

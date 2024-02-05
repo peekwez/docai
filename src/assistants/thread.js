@@ -5,14 +5,12 @@ import OpenAI from "openai";
 import { Config } from "./utils.js";
 import { assistants } from "./assistants/index.js";
 
-const USER_ROLE = "user";
-const SYSTEM_ROLE = "system";
-const ASSISTANT_ROLE = "assistant";
-const GPT_MODEL = "gpt-4-1106-preview";
+const GPT_MODEL = process.env.GPT_MODEL || "gpt-4-1106-preview";
+const PARAM_NAME = process.env.PARAM_NAME || "/dev/secret/openai/api_key";
 
 const config = new Config();
 const openai = new OpenAI({
-  apiKey: await config.getSecretValue("/dev/secret/openai/api_key"),
+  apiKey: await config.getSecretValue(PARAM_NAME),
 });
 
 async function startThread({ userId, assistantName, memorySize = 20 }) {
@@ -54,14 +52,15 @@ async function startThread({ userId, assistantName, memorySize = 20 }) {
       // Stream the result from OpenAI
       this.latestResult = "";
       for await (const chunk of this.stream) {
-        this.latestResult += chunk.choices[0]?.delta?.content || "";
-        process.stdout.write(chunk.choices[0]?.delta?.content || "");
+        let result = chunk.choices[0]?.delta?.content || "";
+        this.latestResult += result;
+        process.stdout.write(result);
       }
       process.stdout.write("\n");
 
       // Prase JSON string to an object and add the response to the thread
       this.chatHistory.push({
-        role: ASSISTANT_ROLE,
+        role: "assistant",
         content: this.latestResult,
       });
       this.updatedAt = new Date().toISOString();
@@ -74,7 +73,7 @@ async function startThread({ userId, assistantName, memorySize = 20 }) {
       }
 
       // Add a new user message to the thread
-      this.chatHistory.push({ role: USER_ROLE, content: message });
+      this.chatHistory.push({ role: "user", content: message });
 
       // Remove the first two messages if the memory size is exceeded
       if (this.chatHistory.length > this.memorySize) {
@@ -83,7 +82,7 @@ async function startThread({ userId, assistantName, memorySize = 20 }) {
 
       // Create messages for OpenAI
       let messages = [
-        { role: SYSTEM_ROLE, content: this.assistant.systemMessage },
+        { role: "system", content: this.assistant.systemMessage },
         ...this.chatHistory,
       ];
 
