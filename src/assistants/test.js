@@ -1,11 +1,12 @@
 import chalk from "chalk";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import { startThread } from "./thread.js";
+import { read } from "fs";
 
 const runTest = async () => {
   const assistantName = "schema-builder";
@@ -40,4 +41,37 @@ const runTest = async () => {
   await thread.saveResult(schemaName, schemaDescription, schemaFileName);
 };
 
+// const runTestCRM = async () => {
+//   const assistantName = "schema-builder";
+//   const thread = await startThread({ assistantName });
+
+//   let firstMessage = fs.readFileSync(schemaFile, "utf8");
+
+//   console.log(chalk.cyan("[*] Adding first message to thread"));
+//   console.log("");
+
+//   await thread.addMessage(
+//     `Rewrite the JSON schema below. Include all the description examples and create enums where possible: \n${firstMessage}\n`
+//   );
+//   await thread.streamResult();
+
+//   const threadFileName = path.join(__dirname, "tmp", "test-crm-thread.json");
+//   await thread.saveThread(threadFileName);
+
+//   const schemaName = "test-crm-schema";
+//   const schemaDescription =
+//     "This schema is a schema for extracting data from a customer relationship management software notes.";
+//   const schemaFileName = path.join(__dirname, "tmp", "test-crm-schema.json");
+//   await thread.saveResult(schemaName, schemaDescription, schemaFileName);
+// };
+
 await runTest();
+// await runTestCRM();
+const data = {
+  OK: true,
+  result: {
+    schema_name: "crm-schema",
+    schema_version: "TpnvIH4qAo",
+    number_of_tokens: 1112,
+  },
+};
