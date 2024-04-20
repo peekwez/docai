@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  title: Schema Listing API
+  description: API for listing available schemas, optionally filtered by schema name.
+  version: 1.0.0
+servers:
+  - url: https://921ktisij4.execute-api.ca-central-1.amazonaws.com/prod
+    description: Production server
+paths:
+  /list-schema:
+    post:
+      operationId: listSchemas
+      summary: Lists schemas
+      description: Retrieves a list of schemas, optionally filtered by a schema name. If no schema name is provided, all schemas are listed.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to filter by
+              required: []
+      responses:
+        "200":
+          description: Successfully retrieved the list of schemas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    schema_name:
+                      type: string
+                    schema_description:
+                      type: string
+                    schema_version:
+                      type: string
+        "400":
+          description: Bad request if the input data structure is incorrect
+        "404":
+          description: Not found if no schemas match the filter
+      security:
+        - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

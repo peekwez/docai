@@ -30,7 +30,7 @@ class LayersStack(cdk.NestedStack):
                 ),
             ),
             compatible_runtimes=[_lambda.Runtime.PYTHON_3_12],
-            compatible_architectures=[_lambda.Architecture.X86_64],
+            compatible_architectures=[_lambda.Architecture.ARM_64],
             removal_policy=cdk.RemovalPolicy.DESTROY,
         )
 

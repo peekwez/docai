@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  title: Schema Retrieval API
+  description: API for retrieving schema information by name and version.
+  version: 1.0.0
+servers:
+  - url: https://921ktisij4.execute-api.ca-central-1.amazonaws.com/prod
+    description: Production server
+paths:
+  /get-schema:
+    post:
+      operationId: getSchema
+      summary: Retrieves a schema by name and version
+      description: Posts a request to retrieve details about a specific schema by its name and version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to retrieve
+                schema_version:
+                  type: string
+                  description: The version of the schema to retrieve
+              required:
+                - schema_name
+                - schema_version
+      responses:
+        "200":
+          description: Successfully retrieved the schema
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema_details:
+                    type: object
+                    additionalProperties: true
+        "400":
+          description: Bad request if the schema name or version is not provided
+        "404":
+          description: Not found if the schema is not available
+      security:
+        - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
