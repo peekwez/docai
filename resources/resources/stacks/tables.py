@@ -39,6 +39,7 @@ class TablesStack(cdk.NestedStack):
             partition_key=dynamodb.Attribute(
                 name="request_id", type=dynamodb.AttributeType.STRING
             ),
+            stream=dynamodb.StreamViewType.NEW_IMAGE,
         )
         self.result_param = ssm.StringParameter(
             self,
