@@ -1,0 +1,1087 @@
+{
+  "info": {
+    "_postman_id": "04ba926c-531c-483a-bbed-313dcdc5607b",
+    "name": "docai",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "216764"
+  },
+  "item": [
+    {
+      "name": "create-schema-simple",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v1_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v1_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"test_loe\",\n\t\"schema_description\": \"Test extracts data from letter of employment\",\n\t\"schema_definition\": {\n\t\t\"$id\": \"https://example.com/test_loe.schema.json\",\n\t\t\"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n\t\t\"title\": \"Employment Letter\",\n\t\t\"description\": \"A schema that represents data extracted from an employment letter\",\n\t\t\"type\": \"object\",\n\t\t\"properties\": {\n\t\t\t\"employer_name\": {\n\t\t\t\t\"description\": \"The name of the employer\",\n\t\t\t\t\"type\": [\"null\", \"string\"]\n\t\t\t}\n\t\t},\n\t\t\"required\": [\"employer_name\"],\n\t\t\"additionalProperties\": false\n\t}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-complex",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v2_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v2_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"test_loe\",\n\t\"schema_description\": \"Test extracts data from letter of employment\",\n\t\"schema_definition\": {\n\t\t\"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n\t\t\"type\": \"object\",\n\t\t\"description\": \"Schema to extract the employer name, employee name, and employee salary from a letter of employment\",\n\t\t\"properties\": {\n\t\t\t\"employer_name\": {\n\t\t\t\t\"type\": [\"string\", \"null\"],\n\t\t\t\t\"description\": \"The name of the employer in the letter of employment\"\n\t\t\t},\n\t\t\t\"employee_name\": {\n\t\t\t\t\"type\": [\"string\", \"null\"],\n\t\t\t\t\"description\": \"The name of the employee in the letter of employment\"\n\t\t\t},\n\t\t\t\"employee_salary\": {\n\t\t\t\t\"type\": \"object\",\n\t\t\t\t\"description\": \"The salary information of the employee in the letter of employment\",\n\t\t\t\t\"properties\": {\n\t\t\t\t\t\"amount\": {\n\t\t\t\t\t\t\"type\": [\"number\", \"null\"],\n\t\t\t\t\t\t\"description\": \"The amount of the salary\"\n\t\t\t\t\t},\n\t\t\t\t\t\"frequency\": {\n\t\t\t\t\t\t\"type\": [\"string\", \"null\"],\n\t\t\t\t\t\t\"description\": \"The frequency of the salary payment\",\n\t\t\t\t\t\t\"enum\": [\"annually\", \"monthly\", \"biweekly\", \"weekly\", \"hourly\"]\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\t\"required\": [\"amount\", \"frequency\"]\n\t\t\t}\n\t\t},\n\t\t\"required\": [\"employer_name\", \"employee_name\", \"employee_salary\"],\n\t\t\"additionalProperties\": false\n\t}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-complex-2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v9_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v9_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"test_loe\",\n\t\"schema_description\": \"Test extracts data from letter of employment\",\n\t\"schema_definition\": {\n        \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n        \"$id\": \"https://example.com/employment-letter-extractor.json\",\n        \"title\": \"Employment Letter Extractor\",\n        \"type\": \"object\",\n        \"description\": \"This schema is used to extract the employer name, employer address, employee name, job title, start date and salary details from a letter of employment.\",\n        \"properties\": {\n            \"employer_name\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The name of the employer provided in the letter of employment.\"\n            },\n            \"employer_address\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"street_number\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"description\": \"The street number of the employer's address provided in the letter of employment.\"\n                    },\n                    \"street_name\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"description\": \"The street name of the employer's address provided in the letter of employment.\"\n                    },\n                    \"city\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"description\": \"The city of the employer's address provided in the letter of employment.\"\n                    },\n                    \"province\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"description\": \"The province of the employer's address provided in the letter of employment.\"\n                    },\n                    \"post_code\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"description\": \"The postal code of the employer's address provided in the letter of employment.\"\n                    },\n                    \"country\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"description\": \"The country of the employer's address provided in the letter of employment.\"\n                    }\n                },\n                \"required\": [\"street_number\", \"street_name\", \"city\", \"province\", \"post_code\", \"country\"]\n            },\n            \"employee_name\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The name of the employee specified in the letter of employment.\"\n            },\n            \"job_title\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The job title or position that the employee is appointed for as provided in the letter of employment.\"\n            },\n            \"start_date\": {\n                \"type\": [\"string\", \"null\"],\n                \"format\": \"date\",\n                \"description\": \"The job commencement date as specified in the letter of employment in `YYYY-MM-DD` format.\"\n            },\n            \"salary\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"amount\": {\n                        \"type\": [\"number\", \"null\"],\n                        \"description\": \"The amount of salary as provided in the letter of employment.\"\n                    },\n                     \"frequency\": {\n                        \"type\": [\"string\", \"null\"],\n                        \"enum\": [\"annual\", \"monthly\", \"biweekly\", \"weekly\", \"hourly\"],\n                        \"description\": \"The frequency at which the salary is paid. It should be one of `annual`, `monthly`, `biweekly`, `weekly`, or `hourly`.\"\n                    }\n                },\n                \"required\": [\"amount\", \"frequency\"]\n            }\n        },\n        \"required\": [\"employer_name\", \"employer_address\", \"employee_name\", \"job_title\", \"start_date\", \"salary\"],\n        \"additionalProperties\": false\n    }\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-invoice-002",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v3_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v3_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schema_name\": \"invoice-schema\",\n  \"schema_description\": \"This schema extracts data from an invoice\",\n  \"schema_definition\": {\n    \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n    \"$id\": \"https://example.com/invoice-schema.json\",\n    \"title\": \"Comprehensive Invoice Information Schema\",\n    \"type\": \"object\",\n    \"description\": \"This schema defines the structure for capturing comprehensive invoice information including invoice number, invoice date, currency, shipper and receiver details, and line items. The invoice number uniquely identifies the invoice, the date indicates when it was issued, and the currency specifies the monetary unit in which the payment is to be made.\",\n    \"properties\": {\n      \"invoice_number\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The unique identifier for the invoice.\"\n      },\n      \"invoice_date\": {\n        \"type\": [\"string\", \"null\"],\n        \"format\": \"date\",\n        \"description\": \"The date on which the invoice was issued, formatted as YYYY-MM-DD.\"\n      },\n      \"invoice_currency\": {\n        \"type\": [\"string\", \"null\"],\n        \"enum\": [\"USD\", \"EUR\", \"CAD\", \"GBP\"],\n        \"description\": \"The currency in which the invoice amounts are denominated. It uses international currency short forms such as USD for the United States Dollar, EUR for the Euro, CAD for the Canadian Dollar, GBP for the British Pound, etc.\"\n      },\n      \"shipper_info\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"shipper_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The full name of the shipper or the company name as stated on the invoice.\"\n          },\n          \"address\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"street_number\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The building number of the shipper's address.\"\n              },\n              \"street_name\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The road or street name in the shipper's address.\"\n              },\n              \"city\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The city in which the shipper resides or the business is located.\"\n              },\n              \"province_or_state\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The province or state of the shipper's address.\"\n              },\n              \"postal_or_zip_code\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The postal or zip code for the shipper's location.\"\n              },\n              \"country\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The country of the shipper's residence or the location of the business.\"\n              }\n            },\n            \"required\": [\n              \"street_number\",\n              \"street_name\",\n              \"city\",\n              \"province_or_state\",\n              \"postal_or_zip_code\",\n              \"country\"\n            ]\n          },\n          \"email\": {\n            \"type\": [\"string\", \"null\"],\n            \"format\": \"email\",\n            \"description\": \"The email address of the shipper as provided on the invoice.\"\n          },\n          \"phone_number\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The phone number of the shipper.\"\n          }\n        },\n        \"required\": [\"shipper_name\", \"address\", \"email\", \"phone_number\"]\n      },\n      \"receiver_info\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"receiver_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The full name of the receiver or the company name as stated on the invoice.\"\n          },\n          \"address\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"street_number\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The building number of the receiver's address.\"\n              },\n              \"street_name\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The road or street name in the receiver's address.\"\n              },\n              \"city\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The city in which the receiver resides or the business is located.\"\n              },\n              \"province_or_state\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The province or state of the receiver's address.\"\n              },\n              \"postal_or_zip_code\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The postal or zip code for the receiver's location.\"\n              },\n              \"country\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The country of the receiver's residence or the location of the business.\"\n              }\n            },\n            \"required\": [\n              \"street_number\",\n              \"street_name\",\n              \"city\",\n              \"province_or_state\",\n              \"postal_or_zip_code\",\n              \"country\"\n            ]\n          },\n          \"email\": {\n            \"type\": [\"string\", \"null\"],\n            \"format\": \"email\",\n            \"description\": \"The email address of the receiver as provided on the invoice.\"\n          },\n          \"phone_number\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The phone number of the receiver.\"\n          }\n        },\n        \"required\": [\"receiver_name\", \"address\", \"email\", \"phone_number\"]\n      },\n      \"line_items\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"description\": {\n              \"type\": [\"string\", \"null\"],\n              \"description\": \"The description or name of the item or service provided.\"\n            },\n            \"unit_cost\": {\n              \"type\": [\"number\", \"null\"],\n              \"description\": \"The cost per unit or per service instance. It accepts decimal values for precise pricing.\"\n            },\n            \"quantity\": {\n              \"type\": [\"integer\", \"null\"],\n              \"description\": \"The quantity of the item purchased or the number of times the service was provided.\"\n            },\n            \"total_cost\": {\n              \"type\": [\"number\", \"null\"],\n              \"description\": \"The total cost for the line item, typically calculated by multiplying the unit cost by the quantity. It accepts decimal values for precise pricing.\"\n            }\n          },\n          \"required\": [\"description\", \"unit_cost\", \"quantity\", \"total_cost\"]\n        }\n      }\n    },\n    \"required\": [\n      \"invoice_number\",\n      \"invoice_date\",\n      \"invoice_currency\",\n      \"shipper_info\",\n      \"receiver_info\",\n      \"line_items\"\n    ],\n    \"additionalProperties\": false\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-invoice-003",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v4_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v4_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schema_name\": \"invoice-schema\",\n  \"schema_description\": \"This schema extracts data from an invoice\",\n  \"schema_definition\": {\n    \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n    \"$id\": \"https://example.com/invoice-schema.json\",\n    \"title\": \"Detailed Invoice Information Schema\",\n    \"type\": \"object\",\n    \"description\": \"This schema structures the information for an invoice including details for the invoice number, date, currency, shipper and receiver information, line items, and taxes applied to the invoice. The taxes are detailed by name, tax number, percentage rate, and the tax amount.\",\n    \"properties\": {\n      \"invoice_number\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The unique identifier for the invoice.\"\n      },\n      \"invoice_date\": {\n        \"type\": [\"string\", \"null\"],\n        \"format\": \"date\",\n        \"description\": \"The date on which the invoice was issued, formatted as YYYY-MM-DD.\"\n      },\n      \"invoice_currency\": {\n        \"type\": [\"string\", \"null\"],\n        \"enum\": [\"USD\", \"EUR\", \"CAD\", \"GBP\"],\n        \"description\": \"The currency in which the invoice amounts are denominated. It uses international currency short forms such as USD for the United States Dollar, EUR for the Euro, CAD for the Canadian Dollar, GBP for the British Pound, etc.\"\n      },\n      \"taxes\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"tax_name\": {\n              \"type\": [\"string\", \"null\"],\n              \"description\": \"The official name of the tax applied, such as VAT, GST, or Sales Tax.\"\n            },\n            \"tax_number\": {\n              \"type\": [\"string\", \"null\"],\n              \"description\": \"The identifier or registration number for the tax or tax account.\"\n            },\n            \"percentage\": {\n              \"type\": [\"number\", \"null\"],\n              \"description\": \"The tax rate, represented as a percentage that applies to the taxable amount.\"\n            },\n            \"amount\": {\n              \"type\": [\"number\", \"null\"],\n              \"description\": \"The amount of tax charged on the invoice, calculated from the taxable total and the tax percentage rate.\"\n            }\n          },\n          \"required\": [\"tax_name\", \"tax_number\", \"percentage\", \"amount\"]\n        },\n        \"description\": \"An array of objects, each representing a different tax applied to the invoice with details such as the tax name, number, percentage, and the calculated amount.\"\n      },\n      \"shipper_info\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"shipper_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The full name of the shipper or the company name as stated on the invoice.\"\n          },\n          \"address\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"street_number\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The building number of the shipper's address.\"\n              },\n              \"street_name\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The road or street name in the shipper's address.\"\n              },\n              \"city\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The city in which the shipper resides or the business is located.\"\n              },\n              \"province_or_state\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The province or state of the shipper's address.\"\n              },\n              \"postal_or_zip_code\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The postal or zip code for the shipper's location.\"\n              },\n              \"country\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The country of the shipper's residence or the location of the business.\"\n              }\n            },\n            \"required\": [\n              \"street_number\",\n              \"street_name\",\n              \"city\",\n              \"province_or_state\",\n              \"postal_or_zip_code\",\n              \"country\"\n            ]\n          },\n          \"email\": {\n            \"type\": [\"string\", \"null\"],\n            \"format\": \"email\",\n            \"description\": \"The email address of the shipper as provided on the invoice.\"\n          },\n          \"phone_number\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The phone number of the shipper.\"\n          }\n        },\n        \"required\": [\"shipper_name\", \"address\", \"email\", \"phone_number\"]\n      },\n      \"receiver_info\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"receiver_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The full name of the receiver or the company name as stated on the invoice.\"\n          },\n          \"address\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"street_number\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The building number of the receiver's address.\"\n              },\n              \"street_name\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The road or street name in the receiver's address.\"\n              },\n              \"city\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The city in which the receiver resides or the business is located.\"\n              },\n              \"province_or_state\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The province or state of the receiver's address.\"\n              },\n              \"postal_or_zip_code\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The postal or zip code for the receiver's location.\"\n              },\n              \"country\": {\n                \"type\": [\"string\", \"null\"],\n                \"description\": \"The country of the receiver's residence or the location of the business.\"\n              }\n            },\n            \"required\": [\n              \"street_number\",\n              \"street_name\",\n              \"city\",\n              \"province_or_state\",\n              \"postal_or_zip_code\",\n              \"country\"\n            ]\n          },\n          \"email\": {\n            \"type\": [\"string\", \"null\"],\n            \"format\": \"email\",\n            \"description\": \"The email address of the receiver as provided on the invoice.\"\n          },\n          \"phone_number\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The phone number of the receiver.\"\n          }\n        },\n        \"required\": [\"receiver_name\", \"address\", \"email\", \"phone_number\"]\n      },\n      \"line_items\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"description\": {\n              \"type\": [\"string\", \"null\"],\n              \"description\": \"The description or name of the item or service provided.\"\n            },\n            \"unit_cost\": {\n              \"type\": [\"number\", \"null\"],\n              \"description\": \"The cost per unit or per service instance. It accepts decimal values for precise pricing.\"\n            },\n            \"quantity\": {\n              \"type\": [\"integer\", \"null\"],\n              \"description\": \"The quantity of the item purchased or the number of times the service was provided.\"\n            },\n            \"total_cost\": {\n              \"type\": [\"number\", \"null\"],\n              \"description\": \"The total cost for the line item, typically calculated by multiplying the unit cost by the quantity. It accepts decimal values for precise pricing.\"\n            }\n          },\n          \"required\": [\"description\", \"unit_cost\", \"quantity\", \"total_cost\"]\n        }\n      }\n    },\n    \"required\": [\n      \"invoice_number\",\n      \"invoice_date\",\n      \"invoice_currency\",\n      \"taxes\",\n      \"shipper_info\",\n      \"receiver_info\",\n      \"line_items\"\n    ],\n    \"additionalProperties\": false\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-crm-004",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v6_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v6_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schema_name\": \"crm-schema\",\n  \"schema_description\": \"This schema is a schema for extracting data from a customer relationship management software notes.\",\n  \"schema_definition\": {\n    \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n    \"$id\": \"https://example.com/crm-schema.json\",\n    \"title\": \"CRM Schema\",\n    \"description\": \"This schema defines the structure of Customer Relationship Management (CRM) data, including personal, account, and lead information.\",\n    \"type\": \"object\",\n    \"properties\": {\n      \"account\": {\n        \"$ref\": \"#/definitions/AccountInformation\"\n      },\n      \"bank_accounts\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"$ref\": \"#/definitions/BankAccount\"\n        }\n      },\n      \"life_events\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"$ref\": \"#/definitions/LifeEvent\"\n        }\n      },\n      \"lead\": {\n        \"$ref\": \"#/definitions/LeadInformation\"\n      }\n    },\n    \"required\": [\"account\", \"bank_accounts\", \"life_events\", \"lead\"],\n    \"definitions\": {\n      \"NameInformation\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"salutation\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The prefix or title for the client's name. For example: 'Sir', 'Mr', 'Miss', 'Dr'.\"\n          },\n          \"first_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's first name.\"\n          },\n          \"middle_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's middle name.\"\n          },\n          \"last_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's last name.\"\n          }\n        },\n        \"required\": [\"salutation\", \"first_name\", \"middle_name\", \"last_name\"]\n      },\n      \"AddressInformation\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"apt\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's apartment number.\"\n          },\n          \"number\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's street number.\"\n          },\n          \"street\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The name of the client's street.\"\n          },\n          \"city\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The city in which the client resides.\"\n          },\n          \"postal_code\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's postal code.\"\n          },\n          \"province\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The province or state in which the client resides.\"\n          },\n          \"country\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The country in which the client resides.\"\n          }\n        },\n        \"required\": [\n          \"apt\",\n          \"number\",\n          \"street\",\n          \"city\",\n          \"postal_code\",\n          \"province\",\n          \"country\"\n        ]\n      },\n      \"AccountInformation\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"allOf\": [\n              {\n                \"$ref\": \"#/definitions/NameInformation\"\n              }\n            ]\n          },\n          \"phone_number\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The contact phone number for the client.\"\n          },\n          \"birth_date\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's date of birth formatted as 'YYYY-MM-DD'.\"\n          },\n          \"address_information\": {\n            \"allOf\": [\n              {\n                \"$ref\": \"#/definitions/AddressInformation\"\n              }\n            ]\n          },\n          \"hobby\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": [\"string\", \"null\"]\n            },\n            \"description\": \"An array of the client's hobbies.\"\n          },\n          \"favourite_team\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The client's favourite sports team.\"\n          },\n          \"family_information\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"Information regarding the client's family.\"\n          }\n        },\n        \"required\": [\n          \"name\",\n          \"phone_number\",\n          \"birth_date\",\n          \"address_information\",\n          \"hobby\",\n          \"favourite_team\",\n          \"family_information\"\n        ]\n      },\n      \"BankAccount\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"account_name\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The name of the client's bank account including the financial institution and type of account.\"\n          },\n          \"account_type\": {\n            \"type\": [\"string\", \"null\"],\n            \"enum\": [\n              \"CheckingAccount\",\n              \"SavingsAccount\",\n              \"InvestmentAccount\",\n              \"BankAccount\"\n            ],\n            \"description\": \"The type of bank account.\"\n          },\n          \"account_balance\": {\n            \"type\": [\"number\", \"null\"],\n            \"description\": \"The available balance within the client's bank account.\"\n          }\n        },\n        \"required\": [\"account_name\", \"account_type\", \"account_balance\"]\n      },\n      \"LifeEvent\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"type\": {\n            \"type\": [\"string\", \"null\"],\n            \"enum\": [\n              \"Birth\",\n              \"Graduation\",\n              \"Job\",\n              \"Marriage\",\n              \"Relocation\",\n              \"Car\",\n              \"Home\",\n              \"Baby\",\n              \"Diagnosis\",\n              \"Retirement\"\n            ],\n            \"description\": \"The type of the life event experienced by the client.\"\n          },\n          \"description\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"A detailed description of the life event.\"\n          }\n        },\n        \"required\": [\"type\", \"description\"]\n      },\n      \"LeadInformation\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"lead_interests\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": [\"string\", \"null\"],\n              \"enum\": [\n                \"Mortgage\",\n                \"Borrowing\",\n                \"Credit Card\",\n                \"Chequing & Savings Account\",\n                \"Wealth & Investing\"\n              ]\n            },\n            \"description\": \"The array of products the lead is interested in.\"\n          }\n        },\n        \"required\": [\"lead_interests\"]\n      }\n    },\n    \"additionalProperties\": false\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-crm-005",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v6_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v6_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schema_name\": \"mls-schema\",\n  \"schema_description\": \"This schema outlines the structure for a property listing in a real estate context, including detailed property information, transaction type, SPIS status, DOM, taxes, and additional remarks about the property.\",\n  \"schema_definition\": {\n    \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n    \"$id\": \"https://example.com/property-listing.json\",\n    \"title\": \"Property Listing\",\n    \"type\": \"object\",\n    \"description\": \"This schema outlines the structure for a property listing in a real estate context, including detailed property information, transaction type, SPIS status, DOM, taxes, and additional remarks about the property.\",\n    \"properties\": {\n      \"mls_number\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The unique identifier for the listing on the Multiple Listing Service (MLS).\"\n      },\n      \"address\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The full physical address of the property, detailed with street number, name, city, state, and postal code.\"\n      },\n      \"unit_number\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The specific unit number for properties within a collective building or complex.\"\n      },\n      \"corp_number\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The number identifying the legal corporation associated with the property.\"\n      },\n      \"road_intersection\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"A nearby street junction or crossing relevant to the property's location for easier identification.\"\n      },\n      \"property_management_company\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The name of the organization managing the real estate property.\"\n      },\n      \"sold_amount\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"The total monetary value at which the property was sold.\"\n      },\n      \"list_amount\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Originally posted price of the property when it was listed.\"\n      },\n      \"contract_date\": {\n        \"type\": [\"string\", \"null\"],\n        \"format\": \"date\",\n        \"description\": \"The date on which the sales agreement was signed, in the format YYYY-MM-DD.\"\n      },\n      \"sold_date\": {\n        \"type\": [\"string\", \"null\"],\n        \"format\": \"date\",\n        \"description\": \"The date on which the property was actually sold, in the format YYYY-MM-DD.\"\n      },\n      \"transaction_type\": {\n        \"type\": [\"string\", \"null\"],\n        \"enum\": [\"Sale\", \"Rent\"],\n        \"description\": \"Specifies the type of transaction being made, indicating if the property is intended for sale or rent.\"\n      },\n      \"spis\": {\n        \"type\": [\"string\", \"null\"],\n        \"enum\": [\"Y\", \"N\"],\n        \"description\": \"Availability of the Seller Property Information Statement (SPIS), where 'Y' stands for Yes and 'N' for No.\"\n      },\n      \"dom\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"The duration in days that the property has been up for sale on the market.\"\n      },\n      \"taxes\": {\n        \"type\": \"object\",\n        \"description\": \"Details concerning property taxation, including the amount due and the related year.\",\n        \"properties\": {\n          \"amount\": {\n            \"type\": [\"number\", \"null\"],\n            \"description\": \"The chargeable sum for the property taxes in a given year.\"\n          },\n          \"year\": {\n            \"type\": [\"integer\", \"null\"],\n            \"description\": \"The fiscal year for which the specified tax amount is valid.\"\n          }\n        },\n        \"required\": [\"amount\", \"year\"]\n      },\n      \"house_type\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Describes the architectural style or design of the property (e.g., detached house, townhouse, condo).\"\n      },\n      \"number_of_levels\": {\n        \"type\": [\"integer\", \"null\"],\n        \"description\": \"Indicates the count of floors or storeys present within the property.\"\n      },\n      \"client_remarks\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Any additional comments or notes provided by the client regarding the property.\"\n      },\n      \"extras\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Supplementary details or features of the property that may be of interest to potential buyers or renters.\"\n      }\n    },\n    \"required\": [\n      \"mls_number\",\n      \"address\",\n      \"unit_number\",\n      \"corp_number\",\n      \"road_intersection\",\n      \"property_management_company\",\n      \"sold_amount\",\n      \"list_amount\",\n      \"contract_date\",\n      \"sold_date\",\n      \"transaction_type\",\n      \"spis\",\n      \"dom\",\n      \"taxes\",\n      \"house_type\",\n      \"number_of_levels\",\n      \"client_remarks\",\n      \"extras\"\n    ],\n    \"additionalProperties\": false\n  }\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-mls-006",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v5_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v5_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schema_name\": \"crm-schema\",\n  \"schema_description\": \"This schema is a schema for extracting data from a customer relationship management software notes.\",\n  \"schema_definition\": {\n    \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n    \"$id\": \"https://example.com/crm-schema.json\",\n    \"title\": \"CRMSchema\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"account\": {\n      \"$ref\": \"#/definitions/AccountInformation\"\n    },\n    \"bank_accounts\": {\n      \"title\": \"Bank Accounts\",\n      \"type\": \"array\",\n      \"items\": {\n        \"$ref\": \"#/definitions/BankAccount\"\n      }\n    },\n    \"life_events\": {\n      \"title\": \"Life Events\",\n      \"type\": \"array\",\n      \"items\": {\n        \"$ref\": \"#/definitions/LifeEvent\"\n      }\n    },\n    \"lead\": {\n      \"$ref\": \"#/definitions/LeadInformation\"\n    }\n  },\n  \"required\": [\"account\", \"bank_accounts\", \"life_events\", \"lead\"],\n  \"definitions\": {\n    \"NameInformation\": {\n      \"title\": \"Name Information\",\n      \"type\": \"object\",\n      \"properties\": {\n        \"salutation\": {\n          \"title\": \"Salutation\",\n          \"description\": \"Salutation. Example Sir, Mr, Miss, Dr\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"first_name\": {\n          \"title\": \"First Name\",\n          \"description\": \"First name\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"middle_name\": {\n          \"title\": \"Middle Name\",\n          \"description\": \"Middle name\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"last_name\": {\n          \"title\": \"Last Name\",\n          \"description\": \"Last name\",\n          \"type\": [\"string\", \"null\"]\n        }\n      },\n      \"required\": [\"salutation\", \"first_name\", \"middle_name\", \"last_name\"]\n    },\n    \"AddressInformation\": {\n      \"title\": \"Address Information\",\n      \"type\": \"object\",\n      \"properties\": {\n        \"apt\": {\n          \"title\": \"Apt\",\n          \"description\": \"Apartment Number\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"number\": {\n          \"title\": \"Number\",\n          \"description\": \"Street number\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"street\": {\n          \"title\": \"Street\",\n          \"description\": \"Street name\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"city\": {\n          \"title\": \"City\",\n          \"description\": \"Address city\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"postal_code\": {\n          \"title\": \"Postal Code\",\n          \"description\": \"Address postal code\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"province\": {\n          \"title\": \"Province\",\n          \"description\": \"Address province\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"country\": {\n          \"title\": \"Country\",\n          \"description\": \"Address country\",\n          \"type\": [\"string\", \"null\"]\n        }\n      },\n      \"required\": [\n        \"apt\",\n        \"number\",\n        \"street\",\n        \"city\",\n        \"postal_code\",\n        \"province\",\n        \"country\"\n      ]\n    },\n    \"AccountInformation\": {\n      \"title\": \"Account Information\",\n      \"type\": \"object\",\n      \"properties\": {\n        \"name\": {\n          \"title\": \"Name\",\n          \"allOf\": [\n            {\n              \"$ref\": \"#/definitions/NameInformation\"\n            }\n          ]\n        },\n        \"phone_number\": {\n          \"title\": \"Phone Number\",\n          \"description\": \"What is the client's phone number?\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"birth_date\": {\n          \"title\": \"Birth Date\",\n          \"description\": \"What is the client's date of birth? Example 2022-04-30\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"address_information\": {\n          \"description\": \"What is the client's address include the apartment number?\",\n          \"allOf\": [\n            {\n              \"$ref\": \"#/definitions/AddressInformation\"\n            }\n          ]\n        },\n        \"hobby\": {\n          \"title\": \"Hobby\",\n          \"description\": \"What is the client's hobbies? Example hockey, movies\",\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": [\"string\", \"null\"]\n          }\n        },\n        \"favourite_team\": {\n          \"title\": \"Favourite Team\",\n          \"description\": \"What is the client's favourite team?\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"family_information\": {\n          \"title\": \"Family Information\",\n          \"description\": \"What is the client's family information?\",\n          \"type\": [\"string\", \"null\"]\n        }\n      },\n      \"required\": [\n        \"name\",\n        \"phone_number\",\n        \"birth_date\",\n        \"address_information\",\n        \"hobby\",\n        \"favourite_team\",\n        \"family_information\"\n      ]\n    },\n    \"BankAccount\": {\n      \"title\": \"BankAccount\",\n      \"type\": \"object\",\n      \"properties\": {\n        \"account_name\": {\n          \"title\": \"Account Name\",\n          \"description\": \"What is the name of the client's bank accounts? For example the client is banking with Mybank , and has $10k in chequing bank account should be 'Mybank chequing account'\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"account_type\": {\n          \"title\": \"Account Type\",\n          \"description\": \"What is the name of the account type for the client's bank account? The rule for this value is as follows: if the client bank account name contains `checking` or `chequing` the answer is `CheckingAccount`, if the client bank account name contains `savings` the answer is  `SavingsAccount`, if the client bank account name contains `investment` the answer is `InvestmentAccount`, if the client bank account does not contain `checking`, `savings`, or `investment` then the answer is `BankAccount`.\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"account_balance\": {\n          \"title\": \"Account Balance\",\n          \"description\": \"How much is in the client's bank account? For example 10k=10000, 1 million=1000000\",\n          \"type\": [\"number\", \"null\"]\n        }\n      },\n      \"required\": [\"account_name\", \"account_type\", \"account_balance\"]\n    },\n    \"LifeEvent\": {\n      \"title\": \"LifeEvent\",\n      \"description\": \"This object stores any life events contained in the context. The sample output should be [{'type': 'Marriage', 'description': 'Married to Peter'}, {'type': 'Job', 'description':'Engineer'}]\",\n      \"type\": \"object\",\n      \"properties\": {\n        \"type\": {\n          \"title\": \"Life Event  Type\",\n          \"description\": \"Extract the name of life events. Only the following life events should be extracted if they exist: Birth, Graduation, Job, Marriage, Relocation, Car, Home, Baby, Diagnosis and Retirement.\",\n          \"type\": [\"string\", \"null\"]\n        },\n        \"description\": {\n          \"title\": \"Life Event Description\",\n          \"description\": \"Extract a description for the life event type. For example: the person married they married to, child/baby name, birth dates, address of purchased home, occupation name, diagnosis details, make of car, school graduated from, where they relocated from\",\n          \"type\": [\"string\", \"null\"]\n        }\n      },\n      \"required\": [\"type\", \"description\"]\n    },\n    \"LeadInformation\": {\n      \"title\": \"LeadInformation\",\n      \"type\": \"object\",\n      \"properties\": {\n        \"lead_interests\": {\n          \"title\": \"Lead Interests\",\n          \"description\": \"What products is the lead interested in? Set the attribute to an null if the answer is not known. For the example context, `John is interested in Mortgage`, the answer is Mortgage. The accepted lead_interest values are Mortgage, Borrowing, Credit Card, Chequing & Savings Account and Wealth & Investing.\",\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": [\"string\", \"null\"]\n          }\n        }\n      },\n      \"required\": [\"lead_interests\"]\n    }\n  }\n}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-schema-mls-007",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"schema_v5_name\", data.schema_name);",
+              "\tpm.globals.set(\"schema_v5_version\", data.schema_version);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schema_name\": \"mls-schema\",\n  \"schema_description\": \"This schema is for extracting data from MLS document\",\n  \"schema_definition\": {\n    \"$schema\": \"http://json-schema.org/draft/2020-12/schema\",\n    \"$id\": \"https://example.com/mls-listing-details.json\",\n    \"title\": \"Comprehensive MLS Listing Details Schema\",\n    \"type\": \"object\",\n    \"description\": \"This schema used to extract data from an MLS (Multiple Listing Service) property listing document. THe extraction MUST meet the specification defined in this schema\",\n    \"properties\": {\n      \"listing_address\": {\n        \"type\": [\"object\", \"null\"],\n        \"properties\": {\n          \"street_address\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The street address located on the MLS document.\"\n          },\n          \"city\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The city in which the property on the MLS is located.\"\n          },\n          \"province_or_state\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The province or state of the property's location as listed in the MLS document.\"\n          },\n          \"postal_code\": {\n            \"type\": [\"string\", \"null\"],\n            \"description\": \"The postal or ZIP code for the property as listed in the MLS document.\"\n          }\n        },\n        \"required\": [\n          \"street_address\",\n          \"city\",\n          \"province_or_state\",\n          \"postal_code\"\n        ],\n        \"description\": \"Extracts the full address of the listing in the MLS document.\"\n      },\n      \"mls_number\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Extract the MLS number associated with the property listing in the document. The value is preceeded by the word 'MLS#:' in the document\"\n      },\n      \"listing_price\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Extract the price of the listing as indicated in the MLS document. The value is preceeded by the word 'List:' in the document.\"\n      },\n      \"selling_price\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Extract the selling price of the listing as indicated in the MLS document. The value is preceeded by the word 'Sold:' in the document.\"\n      },\n      \"listing_status\": {\n        \"type\": [\"string\", \"null\"],\n        \"enum\": [\"Sale\", \"Rent\", null],\n        \"default\": \"Sale\",\n        \"description\": \"Extract whether the listing is for sale or rent based on the MLS document. The value is preeceded by the word 'For:' in the document. Leave as null if not available.\"\n      },\n      \"number_of_bedrooms\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The number of bedrooms for the property, which may include a format like '3+1' to denote extra rooms as listed in the MLS document. The value is preceeded by the word 'Bedrooms:' in the document.\"\n      },\n      \"number_of_washrooms\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The number of washrooms within the property, which might include additional or half washrooms as in '1+1' as listed in the MLS document. The value is preceeded by the word 'Washrooms:' in the document.\"\n      },\n      \"days_on_market\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"The number of days the property has been listed on MLS, also known as Days on Market (DOM). The value is preceeded by the word 'DOM:' in the document.\"\n      },\n      \"locker\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"A value for the presence of a locker associated with the property listing. The value is preceeded by the word 'Locker:' in the document. The value can be 'Owned', 'Exclusive', 'None', or 'Common'. Leave as null if not available.\"\n      },\n      \"maintenance_fees\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"The monthly maintenance fee associated with the property as listed in the MLS document. The value is preceed by the word 'Maint:' in the document\"\n      },\n      \"approx_square_footage\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The approximate square footage of the property in the document, could be a range like '1000-1200'. The value is preceeded by the word 'Apx SqFt:' in the document.\"\n      },\n      \"total_parking_spaces\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"The total number of parking spaces the property listing has. The value is preceeded by the word 'Tot Prk Spcs:' in the document\"\n      },\n      \"room_dimensions\": {\n        \"type\": [\"array\", \"null\"],\n        \"items\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"room_type\": {\n              \"type\": [\"string\", \"null\"],\n              \"enum\": [\n                \"Living\",\n                \"Kitchen\",\n                \"Laundry\",\n                \"Dining\",\n                \"Family\",\n                \"Office\",\n                \"Master\",\n                \"Rec\",\n                \"Solarium\",\n                \"Foyer\",\n                \"Other\",\n                \"Bathroom\",\n                \"Bedroom\",\n                \"Den\",\n                null\n              ],\n              \"default\": \"Other\",\n              \"description\": \"The specific function of the room, e.g., Living Room, Bedroom, etc. Use 'Other' for rooms not listed in the enum. Leave as null if not available.\"\n            },\n            \"level\": {\n              \"type\": [\"string\", \"null\"],\n              \"description\": \"The floor level of the structure where the room is found.\"\n            },\n            \"length\": {\n              \"type\": [\"object\", \"null\"],\n              \"properties\": {\n                \"value\": {\n                  \"type\": [\"number\", \"null\"],\n                  \"description\": \"The length of the room.\"\n                },\n                \"unit\": {\n                  \"type\": [\"string\", \"null\"],\n                  \"enum\": [\"ft\", \"m\", null],\n                  \"default\": \"ft\",\n                  \"description\": \"The unit of measure used for the room's length (feet or meters). Leave as null if not available.\"\n                }\n              },\n              \"required\": [\"value\", \"unit\"],\n              \"description\": \"An object specifying the room's length and its corresponding unit of measurement.\"\n            },\n            \"width\": {\n              \"type\": [\"object\", \"null\"],\n              \"properties\": {\n                \"value\": {\n                  \"type\": [\"number\", \"null\"],\n                  \"description\": \"The width of the room.\"\n                },\n                \"unit\": {\n                  \"type\": [\"string\", \"null\"],\n                  \"enum\": [\"ft\", \"m\", null],\n                  \"default\": \"ft\",\n                  \"description\": \"The unit of measure for the room's width (feet or meters). Leave as null if not available.\"\n                }\n              },\n              \"required\": [\"value\", \"unit\"],\n              \"description\": \"An object indicating the width of the room along with its unit of measure.\"\n            },\n            \"description\": {\n              \"type\": [\"string\", \"null\"],\n              \"description\": \"A detailed description or commentary about the individual characteristics of the room.\"\n            }\n          },\n          \"required\": [\"room_type\", \"level\", \"length\", \"width\", \"description\"]\n        },\n        \"description\": \"A detailed list of measurements and descriptions pertaining to each specific room within the property.\"\n      },\n      \"client_remarks\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Any additional comments or notes provided by the client regarding the property. The remarks is preceeded by 'Client Remks:' in the document.\"\n      },\n      \"extras\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Supplementary information or additional features associated with the property listing. The extras are preceeded by 'Extras:' in the document.\"\n      }\n    },\n    \"required\": [\n      \"listing_address\",\n      \"mls_number\",\n      \"listing_price\",\n      \"selling_price\",\n      \"listing_status\",\n      \"number_of_bedrooms\",\n      \"number_of_washrooms\",\n      \"days_on_market\",\n      \"locker\",\n      \"maintenance_fees\",\n      \"approx_square_footage\",\n      \"total_parking_spaces\",\n      \"room_dimensions\",\n      \"client_remarks\",\n      \"extras\"\n    ],\n    \"additionalProperties\": false\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/create-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["create-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-schema",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v1_name}}\",\n\t\"schema_version\": \"{{schema_v1_version}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/get-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["get-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "list-schema",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["", ""],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"mls-schema\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/list-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["list-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete-schema",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v1_name}}\",\n\t\"schema_version\": \"{{schema_v1_version}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/delete-schema",
+          "host": ["{{api_base_url}}"],
+          "path": ["delete-schema"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-txt",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v9_name}}\",\n\t\"schema_version\": \"{{schema_v9_version}}\",\n\t\"content\": \"{{sample_txt}}\",\n\t\"mime_type\": \"text/plain\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-jpg",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v9_name}}\",\n\t\"schema_version\": \"{{schema_v9_version}}\",\n\t\"content\": \"{{sample_jpg}}\",\n\t\"mime_type\": \"image/jpg\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-png",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v2_name}}\",\n\t\"schema_version\": \"{{schema_v2_version}}\",\n\t\"content\": \"{{sample_png}}\",\n\t\"mime_type\": \"image/png\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-pdf",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v2_name}}\",\n\t\"schema_version\": \"{{schema_v2_version}}\",\n\t\"content\": \"{{sample_pdf}}\",\n\t\"mime_type\": \"application/pdf\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-invoice-pdf",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v4_name}}\",\n\t\"schema_version\": \"{{schema_v4_version}}\",\n\t\"content\": \"{{invoice_pdf}}\",\n\t\"mime_type\": \"application/pdf\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-batch-txt",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"request_id_1\", data.request_id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v1_name}}\",\n\t\"schema_version\": \"{{schema_v1_version}}\",\n\t\"content\": \"{{sample_txt}}\",\n\t\"mime_type\": \"text/plain\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data-batch",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data-batch"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-batch-jpg",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"request_id_2\", data.request_id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v2_name}}\",\n\t\"schema_version\": \"{{schema_v2_version}}\",\n\t\"content\": \"{{sample_jpg}}\",\n\t\"mime_type\": \"image/jpg\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data-batch",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data-batch"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-batch-png",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"request_id_3\", data.request_id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v2_name}}\",\n\t\"schema_version\": \"{{schema_v2_version}}\",\n\t\"content\": \"{{sample_png}}\",\n\t\"mime_type\": \"image/png\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data-batch",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data-batch"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-batch-pdf",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "\tpm.response.to.have.status(200);",
+              "\tvar data = pm.response.json().result;",
+              "\tpm.globals.set(\"request_id_4\", data.request_id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v2_name}}\",\n\t\"schema_version\": \"{{schema_v2_version}}\",\n\t\"content\": \"{{sample_pdf}}\",\n\t\"mime_type\": \"application/pdf\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data-batch",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data-batch"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "extract-data-crm-txt",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"schema_name\": \"{{schema_v5_name}}\",\n\t\"schema_version\": \"{{schema_v5_version}}\",\n\t\"content\": \"{{sample_crm_txt}}\",\n\t\"mime_type\": \"text/plain\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/extract-data",
+          "host": ["{{api_base_url}}"],
+          "path": ["extract-data"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-result",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "{{api_key}}",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"request_id\": \"{{request_id_1}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_base_url}}/get-result",
+          "host": ["{{api_base_url}}"],
+          "path": ["get-result"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
