@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Comprehensive Schema and Data Extraction API
+  description: API services for creating, retrieving, listing, and extracting schemas and data.
+  version: 1.0.0
+servers:
+  - url: https://921ktisij4.execute-api.ca-central-1.amazonaws.com/prod
+    description: Production server
+
+paths:
+  /create-schema:
+    post:
+      operationId: createSchema
+      summary: Creates a new schema
+      description: Creates a new schema with a given name, description, and a detailed JSON schema definition.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to create
+                schema_description:
+                  type: string
+                  description: A brief description of the schema
+                schema_definition:
+                  type: object
+                  description: The JSON schema definition for the new schema
+                  properties:
+                    $id:
+                      type: string
+                      format: uri
+                      description: A unique identifier for the schema definition
+                    $schema:
+                      type: string
+                      format: uri
+                      description: The URI identifying the meta-schema that this schema conforms to
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    type:
+                      type: string
+                      enum: [object] # Assuming object type for simplification
+                    properties:
+                      type: object
+                      additionalProperties:
+                        type: object
+                        properties:
+                          description:
+                            type: string
+                          type:
+                            type: array
+                            items:
+                              type: string
+                    required:
+                      type: array
+                      items:
+                        type: string
+                    additionalProperties:
+                      type: boolean
+              required:
+                - schema_name
+                - schema_description
+                - schema_definition
+      responses:
+        "201":
+          description: Schema successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  schema_id:
+                    type: string
+        "400":
+          description: Bad request if the schema data is incomplete or improperly formatted
+        "403":
+          description: Forbidden if the API key is invalid or missing necessary permissions
+
+  /get-schema:
+    post:
+      operationId: getSchema
+      summary: Retrieves a schema by name and version
+      description: Posts a request to retrieve details about a specific schema by its name and version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to retrieve
+                schema_version:
+                  type: string
+                  description: The version of the schema to retrieve
+              required:
+                - schema_name
+                - schema_version
+      responses:
+        "200":
+          description: Successfully retrieved the schema
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema_details:
+                    type: object
+                    additionalProperties: true
+        "400":
+          description: Bad request if the schema name or version is not provided
+        "404":
+          description: Not found if the schema is not available
+
+  /list-schema:
+    post:
+      operationId: listSchemas
+      summary: Lists schemas
+      description: Retrieves a list of schemas, optionally filtered by a schema name. If no schema name is provided, all schemas are listed.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to filter by
+              required: []
+      responses:
+        "200":
+          description: Successfully retrieved the list of schemas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    schema_name:
+                      type: string
+                    schema_description:
+                      type: string
+                    schema_version:
+                      type: string
+        "400":
+          description: Bad request if the input data structure is incorrect
+        "404":
+          description: Not found if no schemas match the filter
+
+  /extract-data:
+    post:
+      operationId: extractData
+      summary: Extracts data based on a schema
+      description: Extracts structured data from provided text content using a specified schema name and version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to use for data extraction
+                schema_version:
+                  type: string
+                  description: The version of the schema
+                content:
+                  type: string
+                  description: The text content from which data is to be extracted
+                mime_type:
+                  type: string
+                  description: MIME type of the content
+              required:
+                - schema_name
+                - schema_version
+                - content
+                - mime_type
+      responses:
+        "200":
+          description: Successfully extracted the data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  extracted_data:
+                    type: object
+                    additionalProperties: true
+        "400":
+          description: Bad request if any of the required fields are missing or if the content format is not supported
+        "404":
+          description: Not found if the schema specified does not exist
+        "500":
+          description: Server error if the extraction fails due to server-side issues
+
+  /extract-data-batch:
+    post:
+      operationId: extractDataBatch
+      summary: Batch extracts data based on a schema
+      description: Extracts structured data in batch from provided text content using a specified schema name and version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to use for data extraction
+                schema_version:
+                  type: string
+                  description: The version of the schema
+                content:
+                  type: string
+                  description: The text content from which data is to be extracted in batch
+                mime_type:
+                  type: string
+                  description: MIME type of the content
+              required:
+                - schema_name
+                - schema_version
+                - content
+                - mime_type
+      responses:
+        "200":
+          description: Successfully extracted data in batch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        "400":
+          description: Bad request if any of the required fields are missing or if the content format is not supported
+        "404":
+          description: Not found if the schema specified does not exist
+        "500":
+          description: Server error if the batch extraction fails due to server-side issues
+
+  /get-result:
+    post:
+      operationId: getResult
+      summary: Retrieves the result of a request
+      description: Retrieves the result of a previously made request using its unique request ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                  format: uuid
+                  description: The unique identifier for the request whose result is being retrieved
+              required:
+                - request_id
+      responses:
+        "200":
+          description: Successfully retrieved the result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request (e.g., pending, completed, failed)
+                  result:
+                    type: object
+                    additionalProperties: true
+                    description: The detailed result of the request, if available
+        "400":
+          description: Bad request if the request ID is not provided or invalid
+        "404":
+          description: Not found if no result is found for the provided request ID
+        "500":
+          description: Server error if there's an issue retrieving the result
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

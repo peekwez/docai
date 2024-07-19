@@ -46,7 +46,7 @@ class FunctionWithRoleAndDLQ(Construct):
             self,
             "Function",
             runtime=_lambda.Runtime.PYTHON_3_12,
-            architecture=_lambda.Architecture.X86_64,
+            architecture=_lambda.Architecture.ARM_64,
             handler="app.lambda_handler",
             code=_lambda.Code.from_asset(str(self.asset_root / asset_suffix)),
             dead_letter_queue=self.dlq,

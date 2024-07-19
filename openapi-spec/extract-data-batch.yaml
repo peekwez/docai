@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  title: Batch Data Extraction API
+  description: API for extracting structured data from text content in batch mode based on a defined schema.
+  version: 1.0.0
+servers:
+  - url: https://921ktisij4.execute-api.ca-central-1.amazonaws.com/prod
+    description: Production server
+paths:
+  /extract-data-batch:
+    post:
+      operationId: extractDataBatch
+      summary: Batch extracts data based on a schema
+      description: Extracts structured data in batch from provided text content using a specified schema name and version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to use for data extraction
+                schema_version:
+                  type: string
+                  description: The version of the schema
+                content:
+                  type: string
+                  description: The text content from which data is to be extracted in batch
+                mime_type:
+                  type: string
+                  description: MIME type of the content
+              required:
+                - schema_name
+                - schema_version
+                - content
+                - mime_type
+      responses:
+        "200":
+          description: Successfully extracted data in batch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        "400":
+          description: Bad request if any of the required fields are missing or if the content format is not supported
+        "404":
+          description: Not found if the schema specified does not exist
+        "500":
+          description: Server error if the batch extraction fails due to server-side issues
+      security:
+        - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

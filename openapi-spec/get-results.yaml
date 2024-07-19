@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  title: Result Retrieval API
+  description: API for retrieving the results of previous operations using a unique request ID.
+  version: 1.0.0
+servers:
+  - url: https://921ktisij4.execute-api.ca-central-1.amazonaws.com/prod
+    description: Production server
+paths:
+  /get-result:
+    post:
+      operationId: getResult
+      summary: Retrieves the result of a request
+      description: Retrieves the result of a previously made request using its unique request ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                  format: uuid
+                  description: The unique identifier for the request whose result is being retrieved
+              required:
+                - request_id
+      responses:
+        "200":
+          description: Successfully retrieved the result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request (e.g., pending, completed, failed)
+                  result:
+                    type: object
+                    additionalProperties: true
+                    description: The detailed result of the request, if available
+        "400":
+          description: Bad request if the request ID is not provided or invalid
+        "404":
+          description: Not found if no result is found for the provided request ID
+        "500":
+          description: Server error if there's an issue retrieving the result
+      security:
+        - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

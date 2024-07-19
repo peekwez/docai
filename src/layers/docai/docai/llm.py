@@ -1,3 +1,4 @@
+import traceback
 from typing import Any
 
 import boto3
@@ -5,6 +6,8 @@ from openai import OpenAI
 
 from docai import constants as c
 from docai import stream, utils
+
+VALIDATION_RETRY_LIMIT = 3
 
 
 class LLMClient:
@@ -14,11 +17,13 @@ class LLMClient:
     ):
         self.__openai = OpenAI(api_key=api_key)
 
-    def __unwrap_response(self, response: dict, schema_definition: dict) -> dict:
-        valid_data = utils.validate_data(
-            response["choices"][0]["message"]["content"], schema_definition
-        )
-        return {"result": valid_data, "metadata": response["usage"]}
+    def __unwrap_response(self, response: dict) -> dict:
+        content = response["choices"][0]["message"]["content"]
+        metadata = response["usage"]
+        return content, metadata
+
+    def __validate_response(self, content: str, schema_definition: dict) -> dict:
+        return utils.validate_data(content, schema_definition)
 
     def __call_api(
         self, schema_definition: dict, model: str, messages: Any, images: dict
@@ -31,10 +36,30 @@ class LLMClient:
             "max_tokens": c.MAX_OUTPUT_TOKENS,
         }
         data = {"request": payload, "images": images, "error": None}
-        completion = self.__openai.chat.completions.create(**payload)
-        response = self.__unwrap_response(completion.dict(), schema_definition)
-        data.update(response)
-        return data
+
+        for i in range(VALIDATION_RETRY_LIMIT):
+            completion = self.__openai.chat.completions.create(**payload)
+            content, metadata = self.__unwrap_response(completion.dict())
+            try:
+                valid_data = self.__validate_response(content, schema_definition)
+            except Exception as e:
+                if i == VALIDATION_RETRY_LIMIT - 1:
+                    raise e
+                error_message = traceback.format_exc()
+                error_messages = [
+                    {"role": "assistant", "content": content},
+                    {
+                        "role": "user",
+                        "content": f"The output JSON is not valid, try again! The error is as follows : {error_message}",
+                    },
+                ]
+                messages = payload["messages"] + error_messages
+                payload["messages"] = messages
+
+            else:
+                response = {"result": valid_data, "metadata": metadata}
+                data.update(response)
+                return data
 
     def __call__(
         self,

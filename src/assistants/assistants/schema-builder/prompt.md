@@ -18,28 +18,29 @@
 
 ### Set 2
 
-> You must provide a general or overall description for the schema, that it,
-> you MUST indicate what the schema is going to be used for. Be as detailed as
-> possible.
+> A general or overall description for the schema must be provided, and
+> it must indicate the how the schema is going to be used. The description
+> must be as detailed as possible.
 
 ### Set 3
 
 > The field definitions must include the right data formats for each
-> field, such as `date`, `string`, `enum`, `email` etc.
+> field, such as `date`, `string`, `number`, `boolean`, `enum`, `email` etc.
 
 ### Set 4
 
-> The field descriptions must be clear and as detailed as needed, such
-> that a Natural Language Model can understand and use to populate the fields.
+> The field description must be clear and as detailed as needed, such
+> that a Large Language Model can rely on the description as additional
+> instructions use to populate the field.
 
 ### Set 5
 
-> The field data types should admit `null` values and an appropriate data type
+> The field data type should admit `null` values and the appropriate data type
 > since the data could be missing.
 
 ### Set 6
 
-> The field names should be defined with a snake case naming convention.
+> The field name should be defined using a snake case naming convention.
 
 ### Set 7
 

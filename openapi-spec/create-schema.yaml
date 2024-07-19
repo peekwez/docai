@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: Schema Creation API
+  description: API for creating schemas with detailed JSON schema definitions.
+  version: 1.0.0
+servers:
+  - url: https://921ktisij4.execute-api.ca-central-1.amazonaws.com/prod
+    description: Production server
+paths:
+  /create-schema:
+    post:
+      operationId: createSchema
+      summary: Creates a new schema
+      description: Creates a new schema with a given name, description, and a detailed JSON schema definition.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema_name:
+                  type: string
+                  description: The name of the schema to create
+                schema_description:
+                  type: string
+                  description: A brief description of the schema
+                schema_definition:
+                  type: object
+                  description: The JSON schema definition for the new schema
+                  properties:
+                    $id:
+                      type: string
+                      format: uri
+                      description: A unique identifier for the schema definition
+                    $schema:
+                      type: string
+                      format: uri
+                      description: The URI identifying the meta-schema that this schema conforms to
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    type:
+                      type: string
+                      enum: [object] # Assuming object type for simplification
+                    properties:
+                      type: object
+                      additionalProperties:
+                        type: object
+                        properties:
+                          description:
+                            type: string
+                          type:
+                            type: array
+                            items:
+                              type: string
+                    required:
+                      type: array
+                      items:
+                        type: string
+                    additionalProperties:
+                      type: boolean
+              required:
+                - schema_name
+                - schema_description
+                - schema_definition
+      responses:
+        "201":
+          description: Schema successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  schema_id:
+                    type: string
+        "400":
+          description: Bad request if the schema data is incomplete or improperly formatted
+        "403":
+          description: Forbidden if the API key is invalid or missing necessary permissions
+      security:
+        - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
